@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Project;
+use Illuminate\Support\Number;
 
 function getAvailableFunctions(): array
 {
@@ -182,8 +183,9 @@ function getTreeFolderStructure($project, $fullFolderPath)
 
 function getFilesInFolder($project, $fullFolderPath)
 {
-
+    dump($fullFolderPath);
     if (!file_exists($fullFolderPath)) {
+        dump("error");
         return "Error: folder does not exist";
     }
     $files = scandir($fullFolderPath);
@@ -193,8 +195,12 @@ function getFilesInFolder($project, $fullFolderPath)
         // '.' and '..' are the current and parent directories respectively
         if ($item != "." && $item != "..") {
             $fullPath = $fullFolderPath . DIRECTORY_SEPARATOR . $item;
-            if (is_file($item)) {
-                $result .= $item . " (File)" . PHP_EOL;
+            if (is_file($fullPath)) {
+                $filesize = filesize($fullPath);
+                if ($filesize) {
+                    $filesize = Number::fileSize($filesize);
+                }
+                $result .= $item . " (File ".($filesize?? '' ).")" . PHP_EOL;
             } elseif (is_dir($fullPath)) {
                 $result .= $item . " (Folder)" . PHP_EOL;
             }
@@ -211,23 +217,23 @@ function saveContentsToFile($project, $fullFilePath, $contents)
     return "Content saved.";
 }
 
-function runShellCommand($project, $input, $maxLines = 100)
+function runShellCommand(Project $project, $input, $maxLines = 100)
 {
     $input = "cd {$project->full_path} && " . $input;
     $input .= " 2>&1";
 
-    $output = [];
-    $code = 0;
+
     $final = "";
-    exec($input, $output, $code) ;
+
     $result = execWithTimeout($input, 20);
     if ($result['timed_out']) {
         return "Error: Command timed out. Was it an interactive command?";
     }
-    if ($code > 0) {
+    if ($result['code'] > 0) {
         $final = "Errors running command:\n";
     }
     // trim output to first $maxLines lines
+    $output = explode("\n", $result['output']);
     $output = implode("\n", array_slice($output, 0, $maxLines));
     $final .= $output;
     $final = trim($final);
