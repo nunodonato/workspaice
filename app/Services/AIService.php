@@ -136,9 +136,10 @@ class AIService
         $content = $response['content'];
 
 
-        foreach($content as $message) {
+        foreach($content as $i => $message) {
             if (is_string($message)) {
                 $this->appendMessage($message, 'assistant');
+                echo "Assistant: ". $message."\n";
                 continue;
             } else {
                 switch($message['type']) {
@@ -155,6 +156,7 @@ class AIService
                         $shouldRepeat = true;
                         break;
                     case 'text':
+                        echo "Assistant: ". $message['text']."\n";
                         $this->appendMessage($message['text'], 'assistant');
                         break;
                 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Project;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Number;
 
 function getAvailableFunctions(): array
@@ -135,9 +136,37 @@ function getAvailableFunctions(): array
                 ],
                 'required' => ['fullFolderPath']
             ]
+        ],
+        [
+            'name' => 'getContentFromUrl',
+            'description' => 'Returns the call response from a given URL',
+            'input_schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'url' => [
+                        'type' => 'string',
+                        'description' => 'The full url path'
+                    ],
+                ],
+                'required' => ['url']
+            ]
         ]
 
     ];
+}
+
+function getContentFromUrl($project, $url)
+{
+    $response = Http::get($url);
+
+    // get main content without the heading part of html
+    $content = $response->body();
+    $content = explode('<body>', $content);
+    $content = explode('</body>', $content[1]);
+    $content = $content[0];
+
+
+    return $content;
 }
 
 function updateProjectDescription($project, $newDescription)
