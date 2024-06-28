@@ -108,7 +108,7 @@ class AIService
         }
         if (count($messages->messages()) == 0) {
             $limit+=10;
-            if ($limit > 50) {
+            if ($limit > 70) {
                 throw new \Exception('Too many messages without user role. Aborting.');
             }
             goto begin;
