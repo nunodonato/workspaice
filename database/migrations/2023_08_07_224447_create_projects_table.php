@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug');
-            $table->string('description');
-            $table->string('technical_specs');
-            $table->string('system_description');
+            $table->text('description');
+            $table->text('technical_specs');
+            $table->text('system_description');
             $table->string('full_path');
             $table->text('notes');
             $table->timestamps();
