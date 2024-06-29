@@ -9,6 +9,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^11",
         "laravel/tinker": "^2.8",
+        "livewire/livewire": "^3.5",
         "nunodonato/anthropic-php": "^0.1.0"
     },
     "require-dev": {

@@ -8,60 +8,37 @@ function getAvailableFunctions(): array
 {
     return [
         [
-            'name' => 'updateProjectDescription',
-            'description' => 'Update the description of the project',
+            'name' => 'setFilesForBuffer',
+            'description' => 'Set the list of files to include in the buffer',
             'input_schema' => [
                 'type' => 'object',
                 'properties' => [
-                    'newDescription' => [
-                        'type' => 'string',
-                        'description' => 'The new description of the project'
-                    ]
+                    'files' => [
+                        'type' => 'array',
+                        'description' => 'A list of full file paths'
+                    ],
                 ],
-                'required' => ['newDescription']
+                'required' => ['files']
             ]
         ],
         [
-            'name' => 'updateProjectTechnicalSpecs',
-            'description' => 'Update the technical specs of the project',
+            'name' => 'updateProjectInfo',
+            'description' => 'Update the information about the project',
             'input_schema' => [
                 'type' => 'object',
                 'properties' => [
-                    'newTechnicalSpecs' => [
+                    'whatToUpdate' => [
                         'type' => 'string',
-                        'description' => 'The new technical specs of the project'
+                        'enum' => ['description', 'technical_specs', 'system_description', 'notes', 'tasks'],
+                        'description' => 'The section to update'
+                    ],
+                    'newContent' => [
+                        'type' => 'string',
+                        'description' => 'The new content'
                     ]
                 ],
-                'required' => ['newTechnicalSpecs']
+                'required' => ['whatToUpdate', 'newContent']
             ],
-        ],
-        [
-            'name' => 'updateProjectSystemDescription',
-            'description' => 'Update the system description of the project',
-            'input_schema' => [
-                'type' => 'object',
-                'properties' => [
-                    'newSystemDescription' => [
-                        'type' => 'string',
-                        'description' => 'The new system description of the project'
-                    ]
-                ],
-                'required' => ['newSystemDescription']
-            ]
-        ],
-        [
-            'name' => 'updateProjectNotes',
-            'description' => 'Update the notes of the project',
-            'input_schema' => [
-                'type' => 'object',
-                'properties' => [
-                    'newNotes' => [
-                        'type' => 'string',
-                        'description' => 'The new notes of the project'
-                    ]
-                ],
-                'required' => ['newNotes']
-            ]
         ],
         [
             'name' => 'runShellCommand',
@@ -155,6 +132,13 @@ function getAvailableFunctions(): array
     ];
 }
 
+function setFilesForBuffer($project, $files)
+{
+    $project->files = $files;
+    $project->save();
+    return "Files set for buffer.";
+}
+
 function getContentFromUrl($project, $url)
 {
     $response = Http::get($url);
@@ -167,6 +151,29 @@ function getContentFromUrl($project, $url)
 
 
     return $content;
+}
+
+function updateProjectInfo($project, $whatToUpdate, $newContent)
+{
+    switch ($whatToUpdate) {
+        case 'description':
+            return updateProjectDescription($project, $newContent);
+        case 'technical_specs':
+            return updateProjectTechnicalSpecs($project, $newContent);
+        case 'system_description':
+            return updateProjectSystemDescription($project, $newContent);
+        case 'notes':
+            return updateProjectNotes($project, $newContent);
+        case 'tasks':
+            return updateProjectTasks($project, $newContent);
+    }
+}
+
+function updateProjectTasks($project, $newTasks)
+{
+    $project->tasks = $newTasks;
+    $project->save();
+    return "Tasks updated.";
 }
 
 function updateProjectDescription($project, $newDescription)
@@ -212,9 +219,7 @@ function getTreeFolderStructure($project, $fullFolderPath)
 
 function getFilesInFolder($project, $fullFolderPath)
 {
-    dump($fullFolderPath);
     if (!file_exists($fullFolderPath)) {
-        dump("error");
         return "Error: folder does not exist";
     }
     $files = scandir($fullFolderPath);

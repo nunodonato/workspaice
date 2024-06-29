@@ -11,6 +11,12 @@ class Project extends Model
 {
     use HasFactory;
 
+    public $guarded = [];
+
+    public $casts = [
+        'files' => 'array',
+    ];
+
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class);

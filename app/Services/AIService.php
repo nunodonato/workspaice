@@ -170,7 +170,16 @@ class AIService
 
     public function buildSystemMessage(): string
     {
-        $prompt = file_get_contents(storage_path('app/prompts/system.txt'));
+        $fileBuffer = "<FileBuffer>\n";
+        foreach ($this->project->files ?? [] as $file) {
+            $fileBuffer .= "<File path='$file'>\n";
+            $contents = file_get_contents($file);
+            $fileBuffer .= ($contents ?? '(error: file not found)');
+            $fileBuffer .= "\n</File>\n";
+        }
+        $fileBuffer .= "</FileBuffer>\n";
+
+        $prompt = $fileBuffer . file_get_contents(storage_path('app/prompts/system.txt'));
 
         $msg = $prompt;
         $msg .= "<ProjectInformation>";
@@ -179,9 +188,11 @@ class AIService
         $msg .= "Description: {$this->project->description}\n";
         $msg .= "Technical Specs: {$this->project->technical_specs}\n";
         $msg .= "</ProjectInformation>\n";
-        $msg .= "<SystemInformation>\n{$this->project->system_description}\n</SystemInformation>";
-        $msg .= "<ProjectNotes>\n{$this->project->notes}</ProjectNotes>";
+        $msg .= "<SystemInformation>\n{$this->project->system_description}\n</SystemInformation>\n";
+        $msg .= "<Tasks>\n{$this->project->tasks}</Tasks>\n";
+        $msg .= "<Notes>\n{$this->project->notes}</Notes>";
 
+        dump($msg);
         return $msg;
     }
 }
