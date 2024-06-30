@@ -121,7 +121,7 @@ class AIService
             // if is the last message in the array, append special content
             if ($i == count($previousMessages) - 1) {
                 $fileBuffer = "<FileBuffer>\n";
-                foreach ($this->project->files ?? [] as $file) {
+                foreach (session()->get('files', $this->project->files ?? []) as $file) {
                     try {
                         $contents = file_get_contents($file);
                     } catch (\Throwable $t) {
@@ -153,7 +153,7 @@ class AIService
         if (count($messages->messages()) == 0
         || (count($messages->messages()) == 1 && $this->project->messages()->count() > 1)) {
             $limit+=10;
-            if ($limit > 100) {
+            if ($limit > 200) {
                 throw new \Exception('Too many messages without user role. Aborting.');
             }
             goto begin;
@@ -187,7 +187,7 @@ class AIService
         foreach($content as $i => $message) {
             if (is_string($message)) {
                 $this->appendMessage($message, 'assistant', multiple: false);
-                echo "Assistant1: ". $message."\n";
+                echo "Assistant: ". $message."\n";
                 continue;
             } else {
                 switch($message['type']) {
@@ -204,8 +204,16 @@ class AIService
                         $shouldRepeat = true;
                         break;
                     case 'text':
-                        echo "Assistant2 ($i / ".count($content). ") :". $message['text']."\n";
-                        $this->appendMessage($message['text'], 'assistant', multiple: true);
+                        $multiple = count($content) > 1;
+                        if (!$multiple) {
+                            echo "Assistant: ". $message['text']."\n";
+                        } else {
+                            if ($i == 0) {
+                                echo "working..";
+                            }
+                            echo ".";
+                        }
+                        $this->appendMessage($message['text'], 'assistant', multiple: $multiple);
                         break;
                 }
             }

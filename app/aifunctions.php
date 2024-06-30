@@ -182,7 +182,6 @@ function addFileToBuffer($filepath)
         $filesInBuffer[] = $filepath;
     }
     session()->put('files', $filesInBuffer);
-    dump($filepath . " added to buffer");
 }
 
 function updateFilesInBuffer($project)
@@ -192,7 +191,6 @@ function updateFilesInBuffer($project)
         return;
     }
     $project->files = $filesInBuffer;
-    dump($project->files);
     $project->save();
 }
 
@@ -276,7 +274,7 @@ function getFilesInFolder($project, $fullFolderPath)
     return $result;
 }
 
-function saveContentsToFile($project, $fullFilePath, $contents, $mode)
+function saveContentsToFile($project, $fullFilePath, $contents, $mode = 'w')
 {
     switch($mode) {
         case 'w':
