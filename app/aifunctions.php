@@ -56,7 +56,7 @@ function getAvailableFunctions(): array
         ],
         [
             'name' => 'getContentsFromFile',
-            'description' => 'Get the contents of a file',
+            'description' => 'Get the contents of a file not yet in the buffer',
             'input_schema' => [
                 'type' => 'object',
                 'properties' => [
@@ -141,6 +141,7 @@ function setFilesForBuffer($project, $files)
 {
     $project->files = $files;
     $project->save();
+    session()->put('files', $files);
     return "Files set for buffer.";
 }
 
@@ -172,6 +173,27 @@ function updateProjectInfo($project, $whatToUpdate, $newContent)
         case 'tasks':
             return updateProjectTasks($project, $newContent);
     }
+}
+
+function addFileToBuffer($filepath)
+{
+    $filesInBuffer = session()->get('files', []);
+    if (!in_array($filepath, $filesInBuffer)) {
+        $filesInBuffer[] = $filepath;
+    }
+    session()->put('files', $filesInBuffer);
+    dump($filepath . " added to buffer");
+}
+
+function updateFilesInBuffer($project)
+{
+    $filesInBuffer = session()->get('files', []);
+    if ($project->files == $filesInBuffer) {
+        return;
+    }
+    $project->files = $filesInBuffer;
+    dump($project->files);
+    $project->save();
 }
 
 function updateProjectTasks($project, $newTasks)
@@ -214,6 +236,12 @@ function getContentsFromFile($project, $fullFilePath)
     if (!file_exists($fullFilePath)) {
         return "Error: file does not exist";
     }
+
+    $filesize = filesize($fullFilePath);
+    if ($filesize < 10000) {
+        addFileToBuffer($fullFilePath);
+    }
+
     return file_get_contents($fullFilePath);
 }
 
@@ -264,6 +292,12 @@ function saveContentsToFile($project, $fullFilePath, $contents, $mode)
     $file = fopen($fullFilePath, $mode);
     fwrite($file, $contents);
     fclose($file);
+
+    $filesize = filesize($fullFilePath);
+    if ($filesize < 10000) {
+        addFileToBuffer($fullFilePath);
+    }
+
     return "Content saved.";
 }
 

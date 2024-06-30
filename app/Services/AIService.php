@@ -27,7 +27,7 @@ class AIService
         //$this->openai = new OpenAi($open_ai_key);
     }
 
-    public function appendMessage(string $message, string $role, $name = null, $tool_id = null, $input = null)
+    public function appendMessage(string $message, string $role, $name = null, $tool_id = null, $input = null, $multiple = false)
     {
         $message = [
             'content' => $message,
@@ -45,6 +45,7 @@ class AIService
         }
 
         $message['project_id'] = $this->project->id;
+        $message['multiple'] = $multiple;
         Message::create($message);
     }
 
@@ -54,6 +55,8 @@ class AIService
         if ($input) {
             $this->appendMessage($input, $role, $name);
         }
+
+
 
         begin:
         $shouldRepeat = false;
@@ -114,6 +117,36 @@ class AIService
                 $message['role'] = $message['role'] == 'tool_use' ? 'assistant' : 'user';
                 $message['content'] = [$content];
             }
+
+            // if is the last message in the array, append special content
+            if ($i == count($previousMessages) - 1) {
+                $fileBuffer = "<FileBuffer>\n";
+                foreach ($this->project->files ?? [] as $file) {
+                    try {
+                        $contents = file_get_contents($file);
+                    } catch (\Throwable $t) {
+                        $files = session()->get('files');
+                        // remove it
+                        if (in_array($file, $files)) {
+                            $files = array_diff($files, [$file]);
+                            session()->put('files', $files);
+                        }
+                        continue;
+                    }
+                    $fileBuffer .= "<File path='$file'>\n";
+                    $fileBuffer .= ($contents ?? '(error: file not found)');
+                    $fileBuffer .= "\n</File>\n";
+                }
+                $fileBuffer .= "</FileBuffer>\n";
+                if (is_array($message['content'])) {
+                    $last = count($message['content']) -1;
+                    $message['content'][$last]['content'] = $fileBuffer . $message['content'][$last]['content'];
+                } else {
+                    $message['content'] = $fileBuffer . $message['content'];
+                }
+
+            }
+
             $messages->addMessage($message['role'], $message['content']);
         }
 
@@ -125,6 +158,7 @@ class AIService
             }
             goto begin;
         }
+
 
         $tools = new Tools();
         $tools->addToolsFromArray(getAvailableFunctions());
@@ -152,7 +186,7 @@ class AIService
 
         foreach($content as $i => $message) {
             if (is_string($message)) {
-                $this->appendMessage($message, 'assistant');
+                $this->appendMessage($message, 'assistant', multiple: false);
                 echo "Assistant1: ". $message."\n";
                 continue;
             } else {
@@ -166,12 +200,12 @@ class AIService
                         } catch (\Throwable $t) {
                             $result = "Error: " . $t->getMessage();
                         }
-                        $this->appendMessage($result, 'tool_result', $message['name'], $message['id'], null);
+                        $this->appendMessage($result, 'tool_result', $message['name'], $message['id'], null, multiple: true);
                         $shouldRepeat = true;
                         break;
                     case 'text':
                         echo "Assistant2 ($i / ".count($content). ") :". $message['text']."\n";
-                        $this->appendMessage($message['text'], 'assistant');
+                        $this->appendMessage($message['text'], 'assistant', multiple: true);
                         break;
                 }
             }
@@ -180,24 +214,14 @@ class AIService
         if ($shouldRepeat) {
             goto begin;
         }
+        updateFilesInBuffer($this->project);
     }
 
     public function buildSystemMessage(): string
     {
-        $fileBuffer = "<FileBuffer>\n";
-        foreach ($this->project->files ?? [] as $file) {
-            $fileBuffer .= "<File path='$file'>\n";
-            try {
-                $contents = file_get_contents($file);
-            } catch (\Throwable $t) {
-                $contents = '(error: file not found)';
-            }
-            $fileBuffer .= ($contents ?? '(error: file not found)');
-            $fileBuffer .= "\n</File>\n";
-        }
-        $fileBuffer .= "</FileBuffer>\n";
 
-        $prompt = $fileBuffer . file_get_contents(storage_path('app/prompts/system.txt'));
+
+        $prompt = file_get_contents(storage_path('app/prompts/system.txt'));
 
         $msg = $prompt;
         $msg .= "<ProjectInformation>\n";
@@ -209,7 +233,6 @@ class AIService
         $msg .= "<SystemInformation>\n{$this->project->system_description}\n</SystemInformation>\n";
         $msg .= "<Tasks>\n{$this->project->tasks}\n</Tasks>\n";
         $msg .= "<Notes>\n{$this->project->notes}</Notes>";
-
         return $msg;
     }
 }
