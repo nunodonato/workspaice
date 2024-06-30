@@ -47,6 +47,10 @@ class OpenProject extends Command
 
         $ai = new AIService($project);
 
+        if ($project->messages()->count() == 0) {
+            $ai->sendMessage('(system message: start)');
+        }
+
         while(true) {
             $input = trim($this->ask('Instruction'));
             if (strlen($input)>0 && $input[0] == '\\') {

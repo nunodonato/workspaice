@@ -82,8 +82,13 @@ function getAvailableFunctions(): array
                         'type' => 'string',
                         'description' => 'The contents to write to the file'
                     ],
+                    'mode' => [
+                        'type' => 'string',
+                        'description' => 'w: replace with new contents. a: append to the existing contents',
+                        'enum' => ['w', 'a']
+                    ]
                 ],
-                'required' => ['fullFilePath', 'contents']
+                'required' => ['fullFilePath', 'contents', 'mode']
             ]
         ],
         [
@@ -243,11 +248,22 @@ function getFilesInFolder($project, $fullFolderPath)
     return $result;
 }
 
-function saveContentsToFile($project, $fullFilePath, $contents)
+function saveContentsToFile($project, $fullFilePath, $contents, $mode)
 {
-    if (!file_put_contents($fullFilePath, $contents)) {
-        return "Error saving content.";
+    switch($mode) {
+        case 'w':
+            $mode = 'w';
+            break;
+        case 'a':
+            $mode = 'a';
+            break;
+        default:
+            return "Error: Invalid mode. Use 'w' or 'a'.";
     }
+
+    $file = fopen($fullFilePath, $mode);
+    fwrite($file, $contents);
+    fclose($file);
     return "Content saved.";
 }
 

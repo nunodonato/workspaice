@@ -88,6 +88,16 @@ class AIService
                 continue;
             }
             if ($message['role'] == 'tool_use' || $message['role'] == 'tool_result') {
+                $count = count($previousMessages);
+                // when more than 20 msgs, we only care for the most recent 10 tool messages
+                if ($count > 20) {
+                    if ($i < $count - 10) {
+                        continue;
+                    }
+                    if ( ($i == $count - 10) && $message['role'] == 'tool_result') {
+                        continue;
+                    }
+                }
                 $content = [
                     'type' => $message['role'],
                 ];
@@ -106,13 +116,16 @@ class AIService
             }
             $messages->addMessage($message['role'], $message['content']);
         }
-        if (count($messages->messages()) == 0) {
+
+        if (count($messages->messages()) == 0
+        || (count($messages->messages()) == 1 && $this->project->messages()->count() > 1)) {
             $limit+=10;
-            if ($limit > 70) {
+            if ($limit > 100) {
                 throw new \Exception('Too many messages without user role. Aborting.');
             }
             goto begin;
         }
+
         $tools = new Tools();
         $tools->addToolsFromArray(getAvailableFunctions());
 
@@ -131,6 +144,7 @@ class AIService
             'response' => $response,
             'prompt_tokens' => $prompt_tokens,
             'completion_tokens' => $completion_tokens,
+            'message_count' => count($messages->messages()),
         ]);
 
         $content = $response['content'];
@@ -139,7 +153,7 @@ class AIService
         foreach($content as $i => $message) {
             if (is_string($message)) {
                 $this->appendMessage($message, 'assistant');
-                echo "Assistant: ". $message."\n";
+                echo "Assistant1: ". $message."\n";
                 continue;
             } else {
                 switch($message['type']) {
@@ -156,7 +170,7 @@ class AIService
                         $shouldRepeat = true;
                         break;
                     case 'text':
-                        echo "Assistant: ". $message['text']."\n";
+                        echo "Assistant2 ($i / ".count($content). ") :". $message['text']."\n";
                         $this->appendMessage($message['text'], 'assistant');
                         break;
                 }
@@ -173,7 +187,11 @@ class AIService
         $fileBuffer = "<FileBuffer>\n";
         foreach ($this->project->files ?? [] as $file) {
             $fileBuffer .= "<File path='$file'>\n";
-            $contents = file_get_contents($file);
+            try {
+                $contents = file_get_contents($file);
+            } catch (\Throwable $t) {
+                $contents = '(error: file not found)';
+            }
             $fileBuffer .= ($contents ?? '(error: file not found)');
             $fileBuffer .= "\n</File>\n";
         }
@@ -182,17 +200,16 @@ class AIService
         $prompt = $fileBuffer . file_get_contents(storage_path('app/prompts/system.txt'));
 
         $msg = $prompt;
-        $msg .= "<ProjectInformation>";
+        $msg .= "<ProjectInformation>\n";
         $msg .= "Name: {$this->project->name}\n";
         $msg .= "Path: {$this->project->full_path}\n";
         $msg .= "Description: {$this->project->description}\n";
         $msg .= "Technical Specs: {$this->project->technical_specs}\n";
         $msg .= "</ProjectInformation>\n";
         $msg .= "<SystemInformation>\n{$this->project->system_description}\n</SystemInformation>\n";
-        $msg .= "<Tasks>\n{$this->project->tasks}</Tasks>\n";
+        $msg .= "<Tasks>\n{$this->project->tasks}\n</Tasks>\n";
         $msg .= "<Notes>\n{$this->project->notes}</Notes>";
 
-        dump($msg);
         return $msg;
     }
 }

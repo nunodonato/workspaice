@@ -42,6 +42,11 @@ class CreateProject extends Command
             mkdir($full_path, 0777, true);
         }
 
+        $tasks = "1 - Scan the project directory and understand the structure
+        2 - Review the project information and understand the requirements
+        3 - Welcome the user and ask clarifying questions and rewrite the requirements as needed
+        4 - Once enough detail has been collected, create a final task list to replace this one and begin working.";
+
         $project = new Project();
         $project->name = $name;
         $project->description = $description;
@@ -50,6 +55,7 @@ class CreateProject extends Command
         $project->full_path = $full_path;
         $project->slug = $slug;
         $project->notes = "";
+        $project->tasks = $tasks;
         $project->save();
 
         $this->info('Project created successfully.');
