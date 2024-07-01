@@ -120,31 +120,13 @@ class AIService
 
             // if is the last message in the array, append special content
             if ($i == count($previousMessages) - 1) {
-                $fileBuffer = "<FileBuffer>\n";
-                foreach (session()->get('files', $this->project->files ?? []) as $file) {
-                    try {
-                        $contents = file_get_contents($file);
-                    } catch (\Throwable $t) {
-                        $files = session()->get('files');
-                        // remove it
-                        if (in_array($file, $files)) {
-                            $files = array_diff($files, [$file]);
-                            session()->put('files', $files);
-                        }
-                        continue;
-                    }
-                    $fileBuffer .= "<File path='$file'>\n";
-                    $fileBuffer .= ($contents ?? '(error: file not found)');
-                    $fileBuffer .= "\n</File>\n";
-                }
-                $fileBuffer .= "</FileBuffer>\n";
+                $meta = $this->getMetaContent();
                 if (is_array($message['content'])) {
                     $last = count($message['content']) -1;
-                    $message['content'][$last]['content'] = $fileBuffer . $message['content'][$last]['content'];
+                    $message['content'][$last]['content'] = $meta . $message['content'][$last]['content'];
                 } else {
-                    $message['content'] = $fileBuffer . $message['content'];
+                    $message['content'] = $meta . "\n". $message['content'];
                 }
-
             }
 
             $messages->addMessage($message['role'], $message['content']);
@@ -208,6 +190,7 @@ class AIService
                         if (!$multiple) {
                             echo "Assistant: ". $message['text']."\n";
                         } else {
+                            echo "Think: ". $message['text']."\n";
                             if ($i == 0) {
                                 echo "working..";
                             }
@@ -222,7 +205,6 @@ class AIService
         if ($shouldRepeat) {
             goto begin;
         }
-        updateFilesInBuffer($this->project);
     }
 
     public function buildSystemMessage(): string
@@ -238,9 +220,34 @@ class AIService
         $msg .= "Description: {$this->project->description}\n";
         $msg .= "Technical Specs: {$this->project->technical_specs}\n";
         $msg .= "</ProjectInformation>\n";
-        $msg .= "<SystemInformation>\n{$this->project->system_description}\n</SystemInformation>\n";
-        $msg .= "<Tasks>\n{$this->project->tasks}\n</Tasks>\n";
-        $msg .= "<Notes>\n{$this->project->notes}</Notes>";
         return $msg;
+    }
+
+    public function getMetaContent()
+    {
+        $meta = '';
+        $fileBuffer = "<FileBuffer>\n";
+        foreach ($this->project->files ?? [] as $file) {
+            try {
+                $contents = file_get_contents($file);
+            } catch (\Throwable $t) {
+                // remove the file
+                $this->project->files = array_diff($this->project->files, [$file]);
+                $this->project->save();
+
+                continue;
+            }
+            $fileBuffer .= "<File path='$file'>\n";
+            $fileBuffer .= ($contents ?? '(error: file not found)');
+            $fileBuffer .= "\n</File>\n";
+        }
+        $fileBuffer .= "</FileBuffer>\n";
+
+        $meta = $fileBuffer;
+
+        $meta .= "<SystemInformation>\n{$this->project->system_description}\nDate:". now()->format('Y-m-d H:i:s')."\n</SystemInformation>\n";
+        $meta .= "<Tasks>\n{$this->project->tasks}\n</Tasks>\n";
+        $meta .= "<Notes>\n{$this->project->notes}</Notes>";
+        return $meta;
     }
 }

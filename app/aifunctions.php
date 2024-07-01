@@ -9,7 +9,7 @@ function getAvailableFunctions(): array
     return [
         [
             'name' => 'setFilesForBuffer',
-            'description' => 'Set the list of files to include in the buffer',
+            'description' => 'Set the list of files to include in the file buffer',
             'input_schema' => [
                 'type' => 'object',
                 'properties' => [
@@ -141,7 +141,6 @@ function setFilesForBuffer($project, $files)
 {
     $project->files = $files;
     $project->save();
-    session()->put('files', $files);
     return "Files set for buffer.";
 }
 
@@ -175,22 +174,17 @@ function updateProjectInfo($project, $whatToUpdate, $newContent)
     }
 }
 
-function addFileToBuffer($filepath)
+function addFileToBuffer($project, $filepath)
 {
-    $filesInBuffer = session()->get('files', []);
-    if (!in_array($filepath, $filesInBuffer)) {
-        $filesInBuffer[] = $filepath;
-    }
-    session()->put('files', $filesInBuffer);
-}
+    $filesInBuffer = $project->files ?? [];
+    $filesInBuffer[] = $filepath;
 
-function updateFilesInBuffer($project)
-{
-    $filesInBuffer = session()->get('files', []);
-    if ($project->files == $filesInBuffer) {
-        return;
+    if(count($filesInBuffer) > 5) {
+        // keep only the last 5
+        $filesInBuffer = array_slice($filesInBuffer, -5);
     }
-    $project->files = $filesInBuffer;
+
+    $project->files = array_unique($filesInBuffer);
     $project->save();
 }
 
@@ -237,7 +231,7 @@ function getContentsFromFile($project, $fullFilePath)
 
     $filesize = filesize($fullFilePath);
     if ($filesize < 10000) {
-        addFileToBuffer($fullFilePath);
+        addFileToBuffer($project, $fullFilePath);
     }
 
     return file_get_contents($fullFilePath);
@@ -293,7 +287,7 @@ function saveContentsToFile($project, $fullFilePath, $contents, $mode = 'w')
 
     $filesize = filesize($fullFilePath);
     if ($filesize < 10000) {
-        addFileToBuffer($fullFilePath);
+        addFileToBuffer($project, $fullFilePath);
     }
 
     return "Content saved.";

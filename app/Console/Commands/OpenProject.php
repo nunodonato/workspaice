@@ -48,7 +48,7 @@ class OpenProject extends Command
         $ai = new AIService($project);
 
         if ($project->messages()->count() == 0) {
-            $ai->sendMessage('(system message: start)');
+            $ai->sendMessage('hello');
         }
 
         while(true) {
