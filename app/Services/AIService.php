@@ -56,8 +56,6 @@ class AIService
             $this->appendMessage($input, $role, $name);
         }
 
-
-
         begin:
         $shouldRepeat = false;
 
@@ -123,9 +121,21 @@ class AIService
                 $meta = $this->getMetaContent();
                 if (is_array($message['content'])) {
                     $last = count($message['content']) -1;
-                    $message['content'][$last]['content'] = $meta . $message['content'][$last]['content'];
+                    if ($message['role'] == 'user')
+                    {
+                        $message['content'][$last]['content'] = $meta . "\n<user>". $message['content'][$last]['content']."</user>";
+                    } else {
+                        $message['content'][$last]['content'] = $meta . "\n". $message['content'][$last]['content'];
+                    }
+
                 } else {
+                    if ($message['role'] == 'user')
+                    {
+                        $message['content'] = $meta . "\n<user>". $message['content']."</user>";
+                    } else {
                     $message['content'] = $meta . "\n". $message['content'];
+                    }
+
                 }
             }
 

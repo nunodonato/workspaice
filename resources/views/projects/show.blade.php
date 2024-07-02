@@ -11,7 +11,7 @@
                 <div class="w-2/3 h-full pr-4"> <!-- Changed from w-3/4 to w-2/3 -->
                     <div class="h-full bg-white overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="h-full p-3 bg-white border-b border-gray-200">
-                            <livewire:project-chat :project="$project" wire:poll.5s/>
+                            <livewire:project-chat :project="$project" />
                         </div>
                     </div>
                 </div>

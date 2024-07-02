@@ -1,20 +1,54 @@
-<div class="flex flex-col h-full" wire:poll.5s="loadMessages">
-    <div class="flex-grow overflow-hidden no-scrollbar">
-        <div class="h-full flex flex-col-reverse overflow-y-auto pb-2 no-scrollbar">
-            @foreach (array_reverse($messages) as $message)
+@php
+$prevRole = '';
+@endphp
+<div class="flex flex-col h-full" wire:poll.3s="loadMessages">
+    <div class="flex-grow overflow-hidden ">
+        <div class="h-full flex flex-col-reverse overflow-y-auto pb-2">
+            @if(count($messages) > 0 && $messages[0]->role != 'assistant')
+                <div class="inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                </div>
+            @endif
+            @foreach ($messages as $message)
                 @php
-                    $isAssistant = $message->role === 'assistant';
-                    $messageClass = $isAssistant ? 'bg-gray-200' : 'bg-blue-200';
+                    $mergeMessage = false;
+                    $isAssistant = in_array($message->role, ['assistant', 'tool_use', 'tool_result']);
+                    $isTool = in_array($message->role, ['tool_use', 'tool_result']);
+                    $isThinking = $isTool || ($message->role=='assistant' && $message->multiple == 1);
+                    if ($isTool || $isThinking) {
+                        if ($message->role == 'tool_result') {
+                            continue;
+                        }
+                        if ($prevRole == 'think') {
+                            $mergeMessage = true;
+                        }
+                        $messageClass = 'bg-gray-200';
+                        $prevRole = 'think';
+                    } else if ($isAssistant) {
+                        $mergeMessage = false;
+                        $messageClass = 'bg-blue-200';
+                        $prevRole = 'assistant';
+                        } else {
+                        $mergeMessage = false;
+                        $messageClass = 'bg-green-200';
+                        $prevRole = 'user';
+                        }
+
                     $textAlignClass = $isAssistant ? 'text-left' : 'text-right';
                 @endphp
+
 
                 <div class="mb-2 {{ $textAlignClass }}">
                     <div class="inline-block max-w-3/4 p-2 rounded-lg {{ $messageClass }}">
                         <span class="font-bold text-xs uppercase">{{ $message->role }}:</span>
+
                         <p class="mt-1 whitespace-pre-wrap">{{ $message->content }}</p>
+
                     </div>
                 </div>
+
             @endforeach
+
         </div>
     </div>
 

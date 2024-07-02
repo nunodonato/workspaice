@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Jobs\SendMessageJob;
 use App\Models\Project;
 use App\Models\Message;
 use App\Services\AIService;
@@ -28,17 +29,13 @@ class ProjectChat extends Component
     public function loadMessages()
     {
         $newMessages = Message::where('project_id', $this->project->id)
-            ->where('id', '>', $this->lastMessageId)
-            ->orderBy('id', 'asc')
-            ->get();
+            ->orderBy('id', 'desc')
+            ->take(100)->get();
 
+        $this->messages = [];
         foreach ($newMessages as $message) {
             $this->messages[] = $message;
-            $this->lastMessageId = $message->id;
         }
-
-        // Keep only the last 50 messages
-        $this->messages = array_slice($this->messages, -50);
     }
 
     public function sendMessage()
@@ -46,9 +43,9 @@ class ProjectChat extends Component
         $this->validate();
         $message = $this->newMessage;
         $this->newMessage = '';
-        $ai = new AIService($this->project);
-        $ai->sendMessage(trim($message));
-        return 1;
+
+        SendMessageJob::dispatch($this->project, $message);
+
     }
 
     public function render()

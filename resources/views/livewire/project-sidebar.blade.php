@@ -1,4 +1,4 @@
-<div class="bg-gray-800 text-white w-full min-h-screen p-6">
+<div class="bg-gray-800 text-white w-full min-h-screen p-6" wire:poll.8s>
     <h2 class="text-2xl font-bold mb-6 text-blue-300">{{ $project->name }}</h2>
 
     <div class="mb-2">

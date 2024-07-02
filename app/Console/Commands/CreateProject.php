@@ -42,12 +42,12 @@ class CreateProject extends Command
             mkdir($full_path, 0777, true);
         }
 
-        $tasks = "1 - Scan the project directory for existing files and folders [INPROGRESS]
-        2 - Ask clarifying questions and rewrite the requirements as needed
-        3 - Consider the challenges for the project and make notes on how to overcome them
-        4 - Assess the availability of resources and tools needed for the project in the system
-        5 - When all of the above tasks are marked as complete, build a plan of action and get user approval
-        6 - Replace this task list with the new plan";
+        $tasks = "[>] Scan the project directory for existing files and folders
+[ ] Ask clarifying questions and rewrite the requirements as needed
+[ ] Consider the challenges for the project and make notes on how to overcome them
+[ ] Assess the availability of resources and tools needed for the project in the system
+[ ] When all of the above tasks are marked as complete, build a plan of action and get user approval
+[ ] Replace this task list with the new plan";
 
         $project = new Project();
         $project->name = $name;
