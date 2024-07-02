@@ -62,7 +62,7 @@ function getAvailableFunctions(): array
                 'properties' => [
                     'fullFilePath' => [
                         'type' => 'string',
-                        'description' => 'The full path of the file to get the contents of'
+                        'description' => 'The full path to the file'
                     ],
                 ],
                 'required' => ['fullFilePath']
@@ -76,7 +76,7 @@ function getAvailableFunctions(): array
                 'properties' => [
                     'fullFilePath' => [
                         'type' => 'string',
-                        'description' => 'The full path of the file to write the contents to'
+                        'description' => 'The full path to the file'
                     ],
                     'contents' => [
                         'type' => 'string',

@@ -1,28 +1,39 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Projects') }}
+        </h2>
+    </x-slot>
 
-    <title>Coise</title>
-</head>
-<body class="antialiased">
-<div class="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
-    <div class="text-center">
-        <h1 class="text-4xl font-bold text-gray-800 dark:text-white">Projects</h1>
-    </div>
-    <!-- buttont to create a new project -->
-    <a href="{{ route('project.create') }}" class="block bg-blue-500 hover:bg-blue-400 text-white font-semibold text-sm text-center rounded-lg p-2 mt-4">Create New Project</a>
-@foreach($projects as $project)
-    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden w-80 sm:w-96 mx-2 my-4">
-        <img class="w-full h-56 object-cover object-center" src="{{ $project->image }}" alt="{{ $project->title }}">
-        <div class="p-4">
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">{{ $project->title }}</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-300">{{ $project->description }}</p>
-            <a href="{{ route('project.show', $project->id) }}" class="block bg-blue-500 hover:bg-blue-400 text-white font-semibold text-sm text-center rounded-lg p-2 mt-4">Open Project</a>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="mb-6 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-700">Your Projects</h3>
+                <a href="{{ route('projects.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105">
+                    Create New Project
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @forelse($projects as $project)
+                    <div class="bg-white overflow-hidden shadow-sm rounded-lg hover:shadow-md transition duration-300 ease-in-out">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ $project->name }}</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">{{ $project->description }}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Created: {{ $project->created_at->format('M d, Y') }}</span>
+                                <a href="{{ route('projects.show', $project) }}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                                    Enter Chat
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="col-span-full bg-gray-100 rounded-lg p-6 text-center">
+                        <p class="text-gray-600">No projects found. Create your first project to get started!</p>
+                    </div>
+                @endforelse
+            </div>
         </div>
     </div>
-@endforeach
-</div>
-</body>
-</html>
+</x-app-layout>

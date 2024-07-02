@@ -7,16 +7,10 @@ use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
         $projects = Project::all();
         return view('projects.index', compact('projects'));
-    }
-
-    public function show(Project $project)
-    {
-        // load a simple view
-        // use livewire to create a chat interface that self-updates
     }
 
     public function create()
@@ -26,7 +20,47 @@ class ProjectController extends Controller
 
     public function store(Request $request)
     {
-        $project = Project::create($request->all());
-        return redirect()->route('project.show', $project);
+        $validatedData = $request->validate([
+            'name' => 'required|max:255',
+            'description' => 'required',
+        ]);
+
+        $project = Project::create($validatedData);
+
+        return redirect()->route('projects.show', $project)->with('success', 'Project created successfully.');
+    }
+
+    public function show(Project $project)
+    {
+        return view('projects.show', compact('project'));
+    }
+
+    public function edit(Project $project)
+    {
+        return view('projects.edit', compact('project'));
+    }
+
+    public function update(Request $request, Project $project)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|max:255',
+            'description' => 'required',
+        ]);
+
+        $project->update($validatedData);
+
+        return redirect()->route('projects.show', $project)->with('success', 'Project updated successfully.');
+    }
+
+    public function destroy(Project $project)
+    {
+        $project->delete();
+
+        return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');
+    }
+
+    public function chat(Project $project)
+    {
+        return view('projects.show', compact('project'));
     }
 }
