@@ -51,7 +51,7 @@ class AIService
 
     public function sendMessage($input = null, $role = 'user', $name = null): void
     {
-        $limit = 20;
+        $limit = 30;
         if ($input) {
             $this->appendMessage($input, $role, $name);
         }
@@ -92,12 +92,12 @@ class AIService
             }
             if ($message['role'] == 'tool_use' || $message['role'] == 'tool_result') {
                 $count = count($previousMessages);
-                // when more than 20 msgs, we only care for the most recent 10 tool messages
-                if ($count > 20) {
-                    if ($i < $count - 10) {
+                // when more than 30 msgs, we only care for the most recent 20 tool messages
+                if ($count > 30) {
+                    if ($i < $count - 20) {
                         continue;
                     }
-                    if ( ($i == $count - 10) && $message['role'] == 'tool_result') {
+                    if ( ($i == $count - 20) && $message['role'] == 'tool_result') {
                         continue;
                     }
                 }
@@ -226,7 +226,7 @@ class AIService
     public function getMetaContent()
     {
         $meta = '';
-        $fileBuffer = "<FileBuffer>\n";
+        /*$fileBuffer = "<FileBuffer>\n";
         foreach ($this->project->files ?? [] as $file) {
             try {
                 $contents = file_get_contents($file);
@@ -243,7 +243,7 @@ class AIService
         }
         $fileBuffer .= "</FileBuffer>\n";
 
-        $meta = $fileBuffer;
+        $meta = $fileBuffer;*/
 
         $meta .= "<SystemInformation>\n{$this->project->system_description}\nDate:". now()->format('Y-m-d H:i:s')."\n</SystemInformation>\n";
         $meta .= "<Tasks>\n{$this->project->tasks}\n</Tasks>\n";
