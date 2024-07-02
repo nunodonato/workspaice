@@ -9,8 +9,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 
-class SendMessageJob implements ShouldQueue
+class SendMessageJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -19,7 +20,7 @@ class SendMessageJob implements ShouldQueue
      *
      * @var int
      */
-    public $timeout = 60 * 5;
+    public $timeout = 90 * 5;
 
     /**
      * Create a new job instance.

@@ -14,6 +14,8 @@ class ProjectChat extends Component
     public $newMessage = '';
     public $messages = [];
     public $lastMessageId = 0;
+    public $debug = false;
+
 
     protected $rules = [
         'newMessage' => 'required|min:1',
@@ -41,10 +43,24 @@ class ProjectChat extends Component
     public function sendMessage()
     {
         $this->validate();
-        $message = $this->newMessage;
+        $message = trim($this->newMessage);
         $this->newMessage = '';
 
-        SendMessageJob::dispatch($this->project, $message);
+        if ($message === '\\debug') {
+            $this->debug = !$this->debug;
+            return;
+        }
+
+        if ($message === '\\delete') {
+            $message = Message::where('project_id', $this->project->id)
+                ->orderBy('id', 'desc')
+                ->first();
+            $message?->delete();
+            $this->loadMessages();
+            return;
+        }
+
+        $this->job = SendMessageJob::dispatch($this->project, $message);
 
     }
 

@@ -16,6 +16,9 @@ $prevRole = '';
                     $isTool = in_array($message->role, ['tool_use', 'tool_result']);
                     $isThinking = $isTool || ($message->role=='assistant' && $message->multiple == 1);
                     if ($isTool || $isThinking) {
+                        if (!$debug) {
+                            continue;
+                        }
                         if ($message->role == 'tool_result') {
                             continue;
                         }
