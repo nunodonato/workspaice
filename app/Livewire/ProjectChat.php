@@ -15,6 +15,8 @@ class ProjectChat extends Component
     public $messages = [];
     public $lastMessageId = 0;
     public $debug = false;
+    public $firstMessageId = 0;
+    public $loading = false;
 
 
     protected $rules = [
@@ -25,6 +27,7 @@ class ProjectChat extends Component
     {
         $this->project = $project;
         $this->loadMessages();
+        $this->firstMessageId = $project->messages->first()?->id;
 
     }
 
@@ -34,10 +37,18 @@ class ProjectChat extends Component
             ->orderBy('id', 'desc')
             ->take(100)->get();
 
+        $mostRecent = $newMessages->first();
+        if($mostRecent && $mostRecent->role != 'assistant') {
+            $this->loading = true;
+        } else {
+            $this->loading = false;
+        }
+
         $this->messages = [];
         foreach ($newMessages as $message) {
             $this->messages[] = $message;
         }
+
     }
 
     public function sendMessage()

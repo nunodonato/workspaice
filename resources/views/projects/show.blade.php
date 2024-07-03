@@ -16,7 +16,7 @@
                     </div>
                 </div>
                 <div class="w-1/3 h-full overflow-y-auto bg-white shadow-sm sm:rounded-lg p-3"> <!-- Changed from w-1/4 to w-1/3 -->
-                    <livewire:project-sidebar :project="$project" wire:poll.10s/>
+                    <livewire:project-sidebar :project="$project"/>
                 </div>
             </div>
         </div>

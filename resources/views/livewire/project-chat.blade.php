@@ -4,17 +4,18 @@ $prevRole = '';
 <div class="flex flex-col h-full" wire:poll.2s="loadMessages">
     <div class="flex-grow overflow-hidden ">
         <div class="h-full flex flex-col-reverse overflow-y-auto pb-2">
-            @if(count($messages) > 0 && $messages[0]->role != 'assistant')
+            @if($loading)
                 <div class="inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
                     <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
                 </div>
             @endif
             @foreach ($messages as $message)
-
                 @php
-                    if ($message->role == 'user' && $message->content == 'Hello') {
+                // check if the message is the first message of the $project->messages()
+                    if ($message->id == $firstMessageId) {
                         continue;
-                        }
+                    }
+
                         $mergeMessage = false;
                         $isAssistant = in_array($message->role, ['assistant', 'tool_use', 'tool_result']);
                         $isTool = in_array($message->role, ['tool_use', 'tool_result']);
@@ -47,7 +48,7 @@ $prevRole = '';
 
                 <div class="mb-2 {{ $textAlignClass }}">
                     <div class="inline-block max-w-3/4 p-2 rounded-lg {{ $messageClass }}">
-                        <span class="font-bold text-xs uppercase">{{ $message->role }}:</span>
+                        <span class="font-bold text-xs uppercase">{{ $message->role }}</span>
 
                         <p class="mt-1 whitespace-pre-wrap">{{ $message->content }}</p>
 
