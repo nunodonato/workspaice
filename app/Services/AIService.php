@@ -51,7 +51,7 @@ class AIService
 
     public function sendMessage($input = null, $role = 'user', $name = null): void
     {
-        $limit = 30;
+        $limit = 40;
         if ($input) {
             $this->appendMessage($input, $role, $name);
         }
@@ -90,15 +90,16 @@ class AIService
             }
             if ($message['role'] == 'tool_use' || $message['role'] == 'tool_result') {
                 $count = count($previousMessages);
-                // when more than 30 msgs, we only care for the most recent 20 tool messages
-                if ($count > 30) {
-                    if ($i < $count - 20) {
-                        continue;
+
+                if ($i < $count - 20) {
+                    if (strlen($message['content']) > 1000) {
+                        $message['content'] = "[removed due to length]";
                     }
-                    if ( ($i == $count - 20) && $message['role'] == 'tool_result') {
-                        continue;
+                    if (strlen($message['input']) > 1000) {
+                        $message['input'] = "[removed due to length]";
                     }
                 }
+
                 $content = [
                     'type' => $message['role'],
                 ];
