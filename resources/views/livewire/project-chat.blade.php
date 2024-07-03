@@ -1,7 +1,7 @@
 @php
 $prevRole = '';
 @endphp
-<div class="flex flex-col h-full" wire:poll.3s="loadMessages">
+<div class="flex flex-col h-full" wire:poll.2s="loadMessages">
     <div class="flex-grow overflow-hidden ">
         <div class="h-full flex flex-col-reverse overflow-y-auto pb-2">
             @if(count($messages) > 0 && $messages[0]->role != 'assistant')
@@ -10,34 +10,38 @@ $prevRole = '';
                 </div>
             @endif
             @foreach ($messages as $message)
-                @php
-                    $mergeMessage = false;
-                    $isAssistant = in_array($message->role, ['assistant', 'tool_use', 'tool_result']);
-                    $isTool = in_array($message->role, ['tool_use', 'tool_result']);
-                    $isThinking = $isTool || ($message->role=='assistant' && $message->multiple == 1);
-                    if ($isTool || $isThinking) {
-                        if (!$debug) {
-                            continue;
-                        }
-                        if ($message->role == 'tool_result') {
-                            continue;
-                        }
-                        if ($prevRole == 'think') {
-                            $mergeMessage = true;
-                        }
-                        $messageClass = 'bg-gray-200';
-                        $prevRole = 'think';
-                    } else if ($isAssistant) {
-                        $mergeMessage = false;
-                        $messageClass = 'bg-blue-200';
-                        $prevRole = 'assistant';
-                        } else {
-                        $mergeMessage = false;
-                        $messageClass = 'bg-green-200';
-                        $prevRole = 'user';
-                        }
 
-                    $textAlignClass = $isAssistant ? 'text-left' : 'text-right';
+                @php
+                    if ($message->role == 'user' && $message->content == 'Hello') {
+                        continue;
+                        }
+                        $mergeMessage = false;
+                        $isAssistant = in_array($message->role, ['assistant', 'tool_use', 'tool_result']);
+                        $isTool = in_array($message->role, ['tool_use', 'tool_result']);
+                        $isThinking = $isTool || ($message->role=='assistant' && $message->multiple == 1);
+                        if ($isTool || $isThinking) {
+                            if (!$debug) {
+                                continue;
+                            }
+                            if ($message->role == 'tool_result') {
+                                continue;
+                            }
+                            if ($prevRole == 'think') {
+                                $mergeMessage = true;
+                            }
+                            $messageClass = 'bg-gray-200';
+                            $prevRole = 'think';
+                        } else if ($isAssistant) {
+                            $mergeMessage = false;
+                            $messageClass = 'bg-blue-200';
+                            $prevRole = 'assistant';
+                            } else {
+                            $mergeMessage = false;
+                            $messageClass = 'bg-green-200';
+                            $prevRole = 'user';
+                            }
+
+                        $textAlignClass = $isAssistant ? 'text-left' : 'text-right';
                 @endphp
 
 

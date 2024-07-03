@@ -60,7 +60,7 @@ class ProjectChat extends Component
             return;
         }
 
-        $this->job = SendMessageJob::dispatch($this->project, $message);
+        SendMessageJob::dispatch($this->project, $message);
 
     }
 

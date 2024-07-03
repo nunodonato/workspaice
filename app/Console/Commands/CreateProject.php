@@ -45,6 +45,7 @@ class CreateProject extends Command
         $tasks = "[>] Scan the project directory for existing files and folders
 [ ] Ask clarifying questions and rewrite the requirements as needed
 [ ] Consider the challenges for the project and make notes on how to overcome them
+[ ] Gather and update the information about the system we are running on
 [ ] Assess the availability of resources and tools needed for the project in the system
 [ ] When all of the above tasks are marked as complete, build a plan of action and get user approval
 [ ] Replace this task list with the new plan";
