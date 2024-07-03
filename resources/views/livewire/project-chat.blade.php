@@ -64,6 +64,7 @@ $prevRole = '';
         <form wire:submit.prevent="sendMessage" id="chat-form">
             <div class="flex">
                 <textarea
+                    @if($loading) disabled @endif
                     wire:model="newMessage"
                     class="flex-1 rounded-l-lg p-2 border-t mr-0 border-b border-l text-gray-800 border-gray-200 bg-white resize-none"
                     placeholder="Type your message... (Enter to add line, Shift+Enter to send)"
@@ -72,7 +73,7 @@ $prevRole = '';
                     x-data
                     wire:keydown.shift.enter="sendMessage"
                 ></textarea>
-                <button type="submit" class="px-4 rounded-r-lg bg-blue-500 text-white font-bold p-2 uppercase border-blue-500 border-t border-b border-r">Send</button>
+                <button @if($loading) disabled @endif type="submit" class="px-4 rounded-r-lg @if($loading) bg-blue-200 border-blue-200 @else bg-blue-500 border-blue-500 @endif  text-white font-bold p-2 uppercase  border-t border-b border-r">Send</button>
             </div>
         </form>
     </div>
