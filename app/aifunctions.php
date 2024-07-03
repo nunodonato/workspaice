@@ -8,17 +8,17 @@ function getAvailableFunctions(): array
 {
     return [
         [
-            'name' => 'setFilesForBuffer',
-            'description' => 'Set the list of files to include in the file buffer',
+            'name' => 'searchForFile',
+            'description' => 'Returns a list of files in the project directory that contain the given string in their filename',
             'input_schema' => [
                 'type' => 'object',
                 'properties' => [
-                    'files' => [
-                        'type' => 'array',
-                        'description' => 'A list of full file paths'
+                    'string' => [
+                        'type' => 'string',
+                        'description' => 'The string to search for in the filename'
                     ],
                 ],
-                'required' => ['files']
+                'required' => ['string']
             ]
         ],
         [
@@ -137,6 +137,25 @@ function getAvailableFunctions(): array
     ];
 }
 
+function searchForFile($project, string $string): string
+{
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($project->full_path));
+    $matchingFiles = [];
+
+    foreach ($iterator as $file) {
+        if ($file->isFile() && stripos($file->getFilename(), $string) !== false) {
+            $matchingFiles[] = $file->getPathname();
+        }
+    }
+
+    $result = "Matching files with '$string':\n";
+    foreach ($matchingFiles as $file) {
+        $result .= $file . PHP_EOL;
+    }
+
+    return $result;
+}
+
 function setFilesForBuffer($project, $files)
 {
     $project->files = $files;
@@ -226,7 +245,8 @@ function updateProjectNotes($project, $newNotes)
 function getContentsFromFile($project, $fullFilePath)
 {
     if (!file_exists($fullFilePath)) {
-        return "Error: file does not exist";
+        $searchResult = searchForFile($project, basename($fullFilePath));
+        return "Error: file does not exist\n\n".$searchResult;
     }
 
     $filesize = filesize($fullFilePath);
@@ -279,6 +299,14 @@ function saveContentsToFile($project, $fullFilePath, $contents, $mode = 'w')
             break;
         default:
             return "Error: Invalid mode. Use 'w' or 'a'.";
+    }
+
+    // Get the directory path
+    $dir = dirname($fullFilePath);
+
+    // Create the directory and all its parent directories if they don't exist
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
     }
 
     $file = fopen($fullFilePath, $mode);
