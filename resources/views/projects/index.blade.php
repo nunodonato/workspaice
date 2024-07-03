@@ -5,15 +5,16 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <img src="images/logo-text.png" class="mx-auto"/>
             <div class="mb-6 flex justify-between items-center">
                 <h3 class="text-lg font-semibold text-gray-700">Your Projects</h3>
-                <a href="{{ route('projects.create') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105">
+                <a href="{{ route('projects.create') }}" class="bg-green-600 hover:bg-green-800 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105">
                     Create New Project
                 </a>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @forelse($projects as $project)
                     <div class="bg-white overflow-hidden shadow-sm rounded-lg hover:shadow-md transition duration-300 ease-in-out">
@@ -22,8 +23,8 @@
                             <p class="text-gray-600 mb-4 line-clamp-2">{{ $project->description }}</p>
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-gray-500">Created: {{ $project->created_at->format('M d, Y') }}</span>
-                                <a href="{{ route('projects.show', $project) }}" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
-                                    Enter Chat
+                                <a href="{{ route('projects.show', $project) }}" class="bg-cyan-600 hover:bg-cyan-800 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                                    Open
                                 </a>
                             </div>
                         </div>

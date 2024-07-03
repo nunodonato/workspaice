@@ -95,8 +95,10 @@ class AIService
                     if (strlen($message['content']) > 1000) {
                         $message['content'] = "[removed due to length]";
                     }
-                    if (strlen($message['input']) > 1000) {
-                        $message['input'] = "[removed due to length]";
+                    if (isset($message['input']) && strlen(json_encode($message['input'])) > 1000) {
+                        $message['input'] = [
+                            'input' => 'removed due to length'
+                        ];
                     }
                 }
 
@@ -159,6 +161,7 @@ class AIService
         $response = $this->ai->messages(Client::MODEL_3_5_SONNET, $messages, $this->buildSystemMessage(), $tools, [], 2000);
 
         if ($response['type'] == 'error') {
+            dd($messages);
             throw new \Exception($response['error']['message']);
         }
 

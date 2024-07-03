@@ -30,6 +30,11 @@ class SendMessageJob implements ShouldQueue, ShouldBeUnique
 
     }
 
+    public function uniqueId(): string
+    {
+        return $this->project->id;
+    }
+
     /**
      * Execute the job.
      */

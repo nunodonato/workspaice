@@ -304,6 +304,11 @@ function saveContentsToFile($project, $fullFilePath, $contents, $mode = 'w')
     // Get the directory path
     $dir = dirname($fullFilePath);
 
+    // make sure the dir is inside the project full_path
+    if (stripos($dir, $project->full_path) !== 0) {
+        return "Error: Invalid file path. Must be inside the project directory.";
+    }
+
     // Create the directory and all its parent directories if they don't exist
     if (!is_dir($dir)) {
         mkdir($dir, 0755, true);

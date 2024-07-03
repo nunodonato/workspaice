@@ -46,14 +46,12 @@ $prevRole = '';
                 @endphp
 
 
-                <div class="mb-2 {{ $textAlignClass }}">
-                    <div class="inline-block max-w-3/4 p-2 rounded-lg {{ $messageClass }}">
-                        <span class="font-bold text-xs uppercase">{{ $message->role }}</span>
-
-                        <p class="mt-1 whitespace-pre-wrap">{{ $message->content }}</p>
-
+                    <div class="mb-4 {{ $textAlignClass }}">
+                        <div class="inline-block max-w-[75%] p-2 rounded-lg text-left {{ $messageClass }} shadow shadow-lg">
+                            <span class="font-bold text-xs uppercase">{{ $message->role == 'user' ? 'Me' : $message->role }}</span>
+                            <p class="mt-1 whitespace-pre-wrap">{{ $message->content }}</p>
+                        </div>
                     </div>
-                </div>
 
             @endforeach
 

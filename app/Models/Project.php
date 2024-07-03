@@ -21,4 +21,9 @@ class Project extends Model
     {
         return $this->hasMany(Message::class);
     }
+
+    public function calls(): HasMany
+    {
+        return $this->hasMany(Call::class);
+    }
 }

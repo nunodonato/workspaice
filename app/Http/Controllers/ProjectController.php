@@ -54,9 +54,26 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
+        $project->messages()->delete();
+        $project->calls()->delete();
+        $dirPath = $project->full_path;
+        if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
+            $dirPath .= '/';
+        }
+        $files = glob($dirPath . '*', GLOB_MARK);
+        foreach ($files as $file) {
+            if (is_dir($file)) {
+                deleteDir($file);
+            } else {
+                unlink($file);
+            }
+        }
+        if (is_dir($dirPath)) {
+            rmdir($dirPath);
+        }
         $project->delete();
 
-        return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');
+        return redirect()->route('projects')->with('success', 'Project deleted successfully.');
     }
 
     public function chat(Project $project)

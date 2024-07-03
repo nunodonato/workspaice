@@ -102,4 +102,9 @@ class ProjectSidebar extends Component
             throw new \RuntimeException("Failed to open terminal: " . implode("\n", $output));
         }
     }
+
+    public function deleteProject()
+    {
+        $this->redirect(route('projects.delete', $this->project));
+    }
 }
