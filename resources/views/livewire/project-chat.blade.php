@@ -34,7 +34,7 @@ $prevRole = '';
                             $prevRole = 'think';
                         } else if ($isAssistant) {
                             $mergeMessage = false;
-                            $messageClass = 'bg-blue-200';
+                            $messageClass = 'bg-sky-200';
                             $prevRole = 'assistant';
                             } else {
                             $mergeMessage = false;
