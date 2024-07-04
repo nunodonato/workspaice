@@ -18,22 +18,6 @@ class ProjectController extends Controller
         return view('projects.create');
     }
 
-    public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'name' => 'required|max:255',
-            'description' => 'required',
-        ]);
-
-        $project = Project::create($validatedData);
-        $path = $project->full_path;
-        $cmd = "cd $path && git init";
-
-        dd($cmd, shell_exec($cmd));
-
-        return redirect()->route('projects.show', $project)->with('success', 'Project created successfully.');
-    }
-
     public function show(Project $project)
     {
         return view('projects.show', compact('project'));
