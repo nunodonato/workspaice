@@ -26,6 +26,10 @@ class ProjectController extends Controller
         ]);
 
         $project = Project::create($validatedData);
+        $path = $project->full_path;
+        $cmd = "cd $path && git init";
+
+        dd($cmd, shell_exec($cmd));
 
         return redirect()->route('projects.show', $project)->with('success', 'Project created successfully.');
     }
@@ -63,7 +67,7 @@ class ProjectController extends Controller
         $files = glob($dirPath . '*', GLOB_MARK);
         foreach ($files as $file) {
             if (is_dir($file)) {
-                deleteDir($file);
+                rmdir($file);
             } else {
                 unlink($file);
             }

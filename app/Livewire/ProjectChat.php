@@ -31,6 +31,7 @@ class ProjectChat extends Component
 
     }
 
+    #[On('snapshot-restored')]
     public function loadMessages()
     {
         $newMessages = Message::where('project_id', $this->project->id)
@@ -47,6 +48,10 @@ class ProjectChat extends Component
         $this->messages = [];
         foreach ($newMessages as $message) {
             $this->messages[] = $message;
+        }
+
+        if (!$this->firstMessageId) {
+            $this->firstMessageId = $this->project->messages->first()?->id;
         }
 
     }
@@ -77,6 +82,7 @@ class ProjectChat extends Component
 
     public function render()
     {
+        $this->loadMessages();
         return view('livewire.project-chat');
     }
 }

@@ -26,4 +26,9 @@ class Project extends Model
     {
         return $this->hasMany(Call::class);
     }
+
+    public function snapshots(): HasMany
+    {
+        return $this->hasMany(Snapshot::class);
+    }
 }

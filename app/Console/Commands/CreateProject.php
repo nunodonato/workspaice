@@ -62,5 +62,8 @@ class CreateProject extends Command
         $project->save();
 
         $this->info('Project created successfully.');
+
+        $cmd = "cd {$full_path} && git init";
+        shell_exec($cmd);
     }
 }

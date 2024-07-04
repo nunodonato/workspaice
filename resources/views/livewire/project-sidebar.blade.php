@@ -52,7 +52,32 @@
 
     <div x-show="activeTab === 'snapshots'">
         <!-- Snapshots content will go here -->
-        <p class="text-gray-300">Snapshots content coming soon...</p>
+        <button wire:confirm wire:click="createSnapshot" class="bg-blue-600 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform">
+            New Snapshot
+        </button>
+
+        <!-- display session flashed messages -->
+        @if (session()->has('snapshot'))
+            <div class="text-green-400 p-4 rounded-lg mt-4">
+                {{ session('snapshot') }}
+            </div>
+        @endif
+
+        @forelse($snapshots as $snapshot)
+            <div class="flex items-center justify-between p-4 rounded-lg mb-2">
+                <div>
+                    <h3 class="text-lg font-semibold text-blue-200">{{ $snapshot->name }}</h3>
+                    <p class="text-gray-300">{{ $snapshot->created_at->format('M d, Y H:i') }}</p>
+                </div>
+                <div>
+                    <button wire:confirm="Are you sure? All changes done after this snapshot will be lost." wire:click="restoreSnapshot({{ $snapshot->id }})" class="bg-sky-600 hover:bg-sky-800 text-white font-bold py-0 px-2 rounded transition duration-300 ease-in-out transform">
+                        Restore
+                    </button>
+                </div>
+            </div>
+        @empty
+            <p class="text-gray-300">No snapshots found.</p>
+        @endforelse
     </div>
 
     <div x-show="activeTab === 'settings'">

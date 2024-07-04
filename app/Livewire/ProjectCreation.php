@@ -60,6 +60,10 @@ class ProjectCreation extends Component
 
         session()->flash('message', 'Project created successfully.');
 
+        $path = $project->full_path;
+        $cmd = "cd $path && git init";
+        shell_exec($cmd);
+
         return redirect()->route('projects.show', $project);
     }
 

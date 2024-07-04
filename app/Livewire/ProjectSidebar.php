@@ -9,11 +9,13 @@ class ProjectSidebar extends Component
 {
     public $project;
     public $tasks;
+    public $snapshots;
 
     public function mount(Project $project)
     {
         $this->project = $project;
         $this->prepareTasks();
+        $this->snapshots = $project->snapshots()->orderBy('created_at', 'desc')->get();
     }
 
     public function prepareTasks()
@@ -106,5 +108,47 @@ class ProjectSidebar extends Component
     public function deleteProject()
     {
         $this->redirect(route('projects.delete', $this->project));
+    }
+
+    public function createSnapshot()
+    {
+        $path = $this->project->full_path;
+        $commitMessage = now()->format('Y-m-d H:i:s');
+        shell_exec("cd $path && git add .");
+        $commitOutput = shell_exec("cd $path && git commit -m '" . $commitMessage . "'");
+
+        if (preg_match('/\[.* ([a-f0-9]+)\]/', $commitOutput, $matches)) {
+            $commitId = $matches[1];
+            $this->project->snapshots()->create([
+                'commit' => $commitId,
+                'description' => $commitMessage,
+            ]);
+        } else {
+            // flash error message
+            session()->flash('snapshot', 'Failed to create snapshot. No changes?');
+        }
+        $this->snapshots = $this->project->snapshots()->orderBy('created_at', 'desc')->get();
+    }
+
+    public function restoreSnapshot($snapshotId)
+    {
+        $snapshot = $this->project->snapshots()->find($snapshotId);
+        if (!$snapshot) {
+            return;
+        }
+
+        $path = $this->project->full_path;
+        shell_exec("cd $path && git reset --hard " . $snapshot->commit);
+        shell_exec("cd $path && git clean -fd");
+        // delete all snapshots after this one
+        $this->project->snapshots()->where('id', '>', $snapshotId)->delete();
+        $this->snapshots = $this->project->snapshots()->orderBy('created_at', 'desc')->get();
+
+        // delete all messages after this snapshot
+        $this->project->messages()->where('created_at', '>', $snapshot->created_at)->delete();
+
+        // flash success message
+        session()->flash('snapshot', 'Project restored to snapshot');
+        $this->dispatch('snapshot-restored');
     }
 }
