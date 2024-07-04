@@ -38,7 +38,7 @@ $prevRole = '';
                             $prevRole = 'assistant';
                             } else {
                             $mergeMessage = false;
-                            $messageClass = 'bg-green-200';
+                            $messageClass = 'bg-emerald-200';
                             $prevRole = 'user';
                             }
 
@@ -71,7 +71,7 @@ $prevRole = '';
                     x-data
                     wire:keydown.shift.enter="sendMessage"
                 ></textarea>
-                <button @if($loading) disabled @endif type="submit" class="px-4 rounded-r-lg @if($loading) bg-blue-200 border-blue-200 @else bg-blue-500 border-blue-500 @endif  text-white font-bold p-2 uppercase  border-t border-b border-r">Send</button>
+                <button @if($loading) disabled @endif type="submit" class="px-4 rounded-r-lg @if($loading) bg-emerald-200 border-green-200 @else bg-emerald-600 hover:bg-emerald-800 border-green-600 @endif  text-white font-bold p-2 uppercase  border-t border-b border-r">Send</button>
             </div>
         </form>
     </div>
