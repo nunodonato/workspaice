@@ -11,7 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 
-class SendMessageJob implements ShouldQueue, ShouldBeUnique
+class SendMessageJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -28,11 +28,6 @@ class SendMessageJob implements ShouldQueue, ShouldBeUnique
     public function __construct(private readonly Project $project, private readonly string $message)
     {
 
-    }
-
-    public function uniqueId(): string
-    {
-        return $this->project->id;
     }
 
     /**

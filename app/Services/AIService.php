@@ -161,7 +161,7 @@ class AIService
         $response = $this->ai->messages(Client::MODEL_3_5_SONNET, $messages, $this->buildSystemMessage(), $tools, [], 2000);
 
         if ($response['type'] == 'error') {
-            dd($messages);
+            dd($response['error']['message'], $message);
             throw new \Exception($response['error']['message']);
         }
 

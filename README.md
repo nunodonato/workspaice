@@ -1,75 +1,70 @@
-# WorkspAIce
+![Workspaice Logo](public/images/logo-text.png)
 
-WorkspAIce is a collaborative workspace where human and AI work together to build things. It's built with Laravel, Livewire, and Tailwind CSS.
+## Human + AI, creating together.
 
-## Setup Instructions
+Workspaice is a locally-run application that revolutionizes the way you work on projects. By seamlessly blending human creativity with AI assistance, Workspaice empowers you to create, innovate, and bring your ideas to fruition like never before.
 
-1. Clone the repository:
+
+## 🌟 Key Features
+
+- **Local-First**: Run Workspaice directly on your computer, ensuring privacy and speed.
+- **AI Collaboration**: Work side-by-side with AI to enhance your productivity and creativity.
+- **Project Management**: Easily create and organize your projects in one place.
+- **Cross-Platform**: Built with Laravel and SQLite for a smooth experience across different operating systems.
+
+## 🚀 Getting Started
+
+1. **Clone the Repository**
    ```
-   git clone https://github.com/yourusername/workspaice.git
+   git clone https://github.com/nunodonato/workspaice.git
    cd workspaice
    ```
 
-2. Install PHP dependencies:
+2. **Install Dependencies**
    ```
    composer install
-   ```
-
-3. Install JavaScript dependencies:
-   ```
    npm install
    ```
 
-4. Copy the `.env.example` file to `.env` and configure your environment variables:
+3. **Set Up Environment**
    ```
    cp .env.example .env
-   ```
-
-5. Generate an application key:
-   ```
    php artisan key:generate
    ```
 
-6. Run database migrations:
+4. **Configure .env File**
+   Open the `.env` file and update the following:
+    - Ensure the database connection is set to SQLite:
+      ```
+      DB_CONNECTION=sqlite
+      ```
+    - Add your Anthropic API key:
+      ```
+      ANTHROPIC_API_KEY=your_api_key_here
+      ```
+
+5. **Set Up the Database**
    ```
-   php artisan migrate
+   touch database/database.sqlite
+   php artisan migrate:fresh
    ```
 
-7. Compile assets:
+6. **Build Assets**
    ```
-   npm run dev
-   ```
-
-8. Start the development server:
-   ```
-   php artisan serve
+   npm run build
    ```
 
-## Usage
+7. **Start the Application**
+   You'll need to run two commands in parallel:
 
-1. Create a new project:
-   - Navigate to the project creation page
-   - Fill in the project name and description
-   - Click "Create Project"
+   In one terminal, start the server:
+   ```
+   npm run serve
+   ```
 
-2. View a project:
-   - Click on a project in the project list
-   - You'll see the project details in the sidebar and the chat interface
+   In another terminal, start the queue worker:
+   ```
+   php artisan queue:work
+   ```
 
-3. Chat in a project:
-   - In the project view, use the chat interface to send and receive messages
-   - Messages are updated in real-time
-
-## Components
-
-1. ProjectCreation: Handles the creation of new projects
-2. ProjectChat: Manages the chat functionality within a project
-3. ProjectSidebar: Displays project details in the sidebar
-
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+   Visit `http://localhost:8000` in your browser to start using Workspaice!
