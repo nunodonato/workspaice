@@ -288,8 +288,11 @@ function getFilesInFolder($project, $fullFolderPath)
     return $result;
 }
 
-function saveContentsToFile($project, $fullFilePath, $contents, $mode = 'w')
+function saveContentsToFile($project, $fullFilePath, $contents = '', $mode = 'w')
 {
+    if ($contents == '') {
+        return "Error: Content is empty.";
+    }
     switch($mode) {
         case 'w':
             $mode = 'w';
@@ -328,13 +331,10 @@ function saveContentsToFile($project, $fullFilePath, $contents, $mode = 'w')
 
 function runShellCommand(Project $project, $input, $maxLines = 100)
 {
-    $input = "cd {$project->full_path} && " . $input;
     $input .= " 2>&1";
-
-
     $final = "";
 
-    $result = execWithTimeout($input, 20);
+    $result = execWithTimeout($input, 20, $project->full_path);
     if ($result['timed_out']) {
         return "Error: Command timed out. Was it an interactive command?";
     }
@@ -352,14 +352,15 @@ function runShellCommand(Project $project, $input, $maxLines = 100)
     return $final;
 }
 
-function execWithTimeout($cmd, $timeout = 20) {
+function execWithTimeout($cmd, $timeout = 20, $path) {
+    $env = array('PATH' => getenv('PATH'));
     $descriptorspec = array(
         0 => array("pipe", "r"),  // stdin
         1 => array("pipe", "w"),  // stdout
         2 => array("pipe", "w")   // stderr
     );
 
-    $process = proc_open($cmd, $descriptorspec, $pipes);
+    $process = proc_open($cmd, $descriptorspec, $pipes, $path, $env);
 
     if (is_resource($process)) {
         // Set streams to non-blocking mode

@@ -147,8 +147,8 @@ class AIService
 
         if (count($messages->messages()) == 0
         || (count($messages->messages()) == 1 && $this->project->messages()->count() > 1)) {
-            $limit+=10;
-            if ($limit > 200) {
+            $limit+=20;
+            if ($limit > 500) {
                 throw new \Exception('Too many messages without user role. Aborting.');
             }
             goto begin;

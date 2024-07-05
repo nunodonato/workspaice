@@ -28,7 +28,7 @@
                                 {{ $header }}
                             </div>
                             <div class="flex-shrink-0">
-                                <a href="/"><img src=" {{ url('images/logo-right.png') }}" alt="Logo" class="block h-9 w-auto fill-current text-gray-800" /></a>
+                                <a href="/"><img src=" {{ url('/images/logo-right.png') }}" alt="Logo" class="block h-9 w-auto fill-current text-gray-800" /></a>
                             </div>
                         </div>
                     </div>
