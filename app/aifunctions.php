@@ -56,7 +56,7 @@ function getAvailableFunctions(): array
         ],
         [
             'name' => 'getContentsFromFile',
-            'description' => 'Get the contents of a file not yet in the buffer',
+            'description' => 'Get the contents of a file not in the sticky files',
             'input_schema' => [
                 'type' => 'object',
                 'properties' => [
@@ -156,13 +156,6 @@ function searchForFile($project, string $string): string
     return $result;
 }
 
-function setFilesForBuffer($project, $files)
-{
-    $project->files = $files;
-    $project->save();
-    return "Files set for buffer.";
-}
-
 function getContentFromUrl($project, $url)
 {
     $response = Http::get($url);
@@ -191,20 +184,6 @@ function updateProjectInfo($project, $whatToUpdate, $newContent)
         case 'tasks':
             return updateProjectTasks($project, $newContent);
     }
-}
-
-function addFileToBuffer($project, $filepath)
-{
-    $filesInBuffer = $project->files ?? [];
-    $filesInBuffer[] = $filepath;
-
-    if(count($filesInBuffer) > 5) {
-        // keep only the last 5
-        $filesInBuffer = array_slice($filesInBuffer, -5);
-    }
-
-    $project->files = array_unique($filesInBuffer);
-    $project->save();
 }
 
 function updateProjectTasks($project, $newTasks)
@@ -247,11 +226,6 @@ function getContentsFromFile($project, $fullFilePath)
     if (!file_exists($fullFilePath)) {
         $searchResult = searchForFile($project, basename($fullFilePath));
         return "Error: file does not exist\n\n".$searchResult;
-    }
-
-    $filesize = filesize($fullFilePath);
-    if ($filesize < 10000) {
-        addFileToBuffer($project, $fullFilePath);
     }
 
     return file_get_contents($fullFilePath);
@@ -320,11 +294,6 @@ function saveContentsToFile($project, $fullFilePath, $contents = '', $mode = 'w'
     $file = fopen($fullFilePath, $mode);
     fwrite($file, $contents);
     fclose($file);
-
-    $filesize = filesize($fullFilePath);
-    if ($filesize < 10000) {
-        addFileToBuffer($project, $fullFilePath);
-    }
 
     return "Content saved.";
 }

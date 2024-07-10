@@ -153,7 +153,7 @@ class AIService
             }
             goto begin;
         }
-
+        dd($messages);
 
         $tools = new Tools();
         $tools->addToolsFromArray(getAvailableFunctions());
@@ -240,6 +240,16 @@ class AIService
     public function getMetaContent()
     {
         $meta = '';
+        if (count($this->project->files))
+        {
+            $meta .= "<StickyFiles>\n";
+            foreach ($this->project->files as $file) {
+                $meta .= "<File path='$file'>\n";
+                $meta .= file_get_contents($file);
+                $meta .= "\n</File>\n";
+            }
+            $meta .= "</StickyFiles>\n";
+        }
         /*$fileBuffer = "<FileBuffer>\n";
         foreach ($this->project->files ?? [] as $file) {
             try {

@@ -4,9 +4,13 @@ namespace App\Livewire;
 
 use App\Models\Project;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class ProjectSidebar extends Component
 {
+
+    use WithFileUploads;
+
     public $project;
     public $tasks;
     public $snapshots;
@@ -19,11 +23,17 @@ class ProjectSidebar extends Component
     public $inputCost = 0;
     public $outputCost = 0;
 
+    public $files = [];
+    public $currentPath = '/';
+    public $directoryContents = [];
+
     public function mount(Project $project)
     {
         $this->project = $project;
+        $this->currentPath = $project->full_path;
         $this->prepareTasks();
         $this->snapshots = $project->snapshots()->orderBy('created_at', 'desc')->get();
+        $this->refreshFiles();
     }
 
     public function prepareTasks()
@@ -42,8 +52,22 @@ class ProjectSidebar extends Component
     public function render()
     {
         $this->prepareTasks();
+        $this->refreshFiles();
         $this->countTokens();
         return view('livewire.project-sidebar');
+    }
+
+    public function refreshFiles()
+    {
+        $this->files = [];
+        foreach($this->project->files as $file)
+        {
+            $this->files[] = [
+                'name' => basename($file),
+                'full_path' => $file,
+                'size' => filesize($file)
+            ];
+        }
     }
 
     public function countTokens()
@@ -153,4 +177,57 @@ class ProjectSidebar extends Component
         $this->redirect(route('projects.restore', ['project' => $this->project, 'snapshotId' => $snapshotId]));
 
     }
+
+    public function browseFiles($path = null)
+    {
+        if ($path === null) {
+            $path = $this->currentPath;
+        } else {
+            $this->currentPath = $path;
+        }
+
+
+        $this->directoryContents = $this->getDirectoryContents($path);
+    }
+
+    private function getDirectoryContents($path)
+    {
+        $contents = [];
+        $items = scandir($path);
+        foreach ($items as $item) {
+            if ($item != "." && $item != "..") {
+                $fullPath = $path . DIRECTORY_SEPARATOR . $item;
+                $contents[] = [
+                    'name' => $item,
+                    'path' => $fullPath,
+                    'type' => is_dir($fullPath) ? 'dir' : 'file',
+                    'size' => is_dir($fullPath) ? '' : filesize($fullPath)
+                ];
+            }
+        }
+        return $contents;
+    }
+
+    public function addFile($filePath)
+    {
+        $files = $this->project->files;
+        if (!in_array($filePath, $files)) {
+            $files[] = $filePath;
+            $this->project->files = $files;
+            $this->project->save();
+        }
+        $this->refreshFiles();
+    }
+
+    public function removeFile($index)
+    {
+        $files = $this->project->files;
+        unset($files[$index]);
+        $files = array_values($files);
+        $this->project->files = $files;
+        $this->project->save();
+        $this->refreshFiles();
+    }
+
+
 }
