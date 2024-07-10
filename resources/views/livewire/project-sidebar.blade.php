@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Number; @endphp
 <div class="bg-gray-800 text-white w-full min-h-screen p-6" x-data="{ activeTab: 'project' }" wire:poll.8s>
     <div class="flex items-center mb-6">
         <h2 class="text-2xl font-bold text-blue-300 mr-2">{{ $project->name }}</h2>
@@ -81,6 +82,15 @@
     </div>
 
     <div x-show="activeTab === 'settings'">
+        <!-- show stats (input tokens and output token used) -->
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold mb-2 text-blue-200">Stats</h3>
+            <p class="text-gray-300">Input Tokens: {{ Number::format($inputTokens) }} ({{ Number::currency($inputCost) }})</p>
+            <p class="text-gray-300">Output Tokens: {{ Number::format($outputTokens) }} ({{ Number::currency($outputCost) }})</p>
+            <p class="text-gray-300 font-semibold mt-2">Total Cost: {{ Number::currency($inputCost + $outputCost) }}</p>
+        </div>
+
+
         <!-- button to delete project with livewire confirmation -->
         <div class="mb-6">
             <button wire:click="deleteProject" wire:confirm="Delete this project and all its files?" class="bg-red-600 hover:bg-red-800 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform">

@@ -10,6 +10,14 @@ class ProjectSidebar extends Component
     public $project;
     public $tasks;
     public $snapshots;
+    public $inputTokens = 0;
+    public $outputTokens = 0;
+
+    public $inputPricePerM = 3;
+    public $outputPricePerM = 15;
+
+    public $inputCost = 0;
+    public $outputCost = 0;
 
     public function mount(Project $project)
     {
@@ -34,9 +42,19 @@ class ProjectSidebar extends Component
     public function render()
     {
         $this->prepareTasks();
+        $this->countTokens();
         return view('livewire.project-sidebar');
     }
 
+    public function countTokens()
+    {
+        // sum the calls prompt_tokens columns
+        $this->inputTokens = $this->project->calls()->sum('prompt_tokens');
+        $this->outputTokens = $this->project->calls()->sum('completion_tokens');
+
+        $this->inputCost = $this->inputTokens * $this->inputPricePerM / 1_000_000;
+        $this->outputCost = $this->outputTokens * $this->outputPricePerM / 1_000_000;
+    }
     public function openFolder()
     {
         $escapedPath = escapeshellarg($this->project->full_path);
