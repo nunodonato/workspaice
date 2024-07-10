@@ -132,23 +132,7 @@ class ProjectSidebar extends Component
 
     public function restoreSnapshot($snapshotId)
     {
-        $snapshot = $this->project->snapshots()->find($snapshotId);
-        if (!$snapshot) {
-            return;
-        }
+        $this->redirect(route('projects.restore', ['project' => $this->project, 'snapshotId' => $snapshotId]));
 
-        $path = $this->project->full_path;
-        shell_exec("cd $path && git reset --hard " . $snapshot->commit);
-        shell_exec("cd $path && git clean -fd");
-        // delete all snapshots after this one
-        $this->project->snapshots()->where('id', '>', $snapshotId)->delete();
-        $this->snapshots = $this->project->snapshots()->orderBy('created_at', 'desc')->get();
-
-        // delete all messages after this snapshot
-        $this->project->messages()->where('created_at', '>', $snapshot->created_at)->delete();
-
-        // flash success message
-        session()->flash('snapshot', 'Project restored to snapshot');
-        $this->dispatch('snapshot-restored');
     }
 }

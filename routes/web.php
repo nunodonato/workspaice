@@ -10,3 +10,4 @@ Route::resource('projects', ProjectController::class);
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects');
 Route::get('/projects/{project:slug}', [ProjectController::class, 'chat'])->name('projects.show');
 Route::get('/projects/delete/{project:slug}', [ProjectController::class, 'destroy'])->name('projects.delete');
+Route::get('/projects/{project:slug}/restore/{snapshotId}', [ProjectController::class, 'restoreSnapshot'])->name('projects.restore');
