@@ -43,13 +43,30 @@ $prevRole = '';
                             }
 
                         $textAlignClass = $isAssistant ? 'text-left' : 'text-right';
+
+                        switch($message->role) {
+                            case 'tool_use':
+                                $content = $message->content;
+                                if ($content == 'saveContentsToFile' || $content == 'getFilesInFolder'
+                                 || $content == 'runShellCommand' || $content == 'searchForFile'
+                                 || $content == 'getContentsFromFile' || $content == 'getContentFromUrl') {
+                                    $input = $message->input;
+                                    $content .= '
+'.reset($input);
+
+                                 }
+                                break;
+                            default:
+                                $content = $message->content;
+                                break;
+                        }
                 @endphp
 
 
                     <div class="mb-4 {{ $textAlignClass }}">
                         <div class="inline-block max-w-[75%] p-2 rounded-lg text-left {{ $messageClass }} shadow shadow-lg">
                             <span class="font-bold text-xs uppercase">{{ $message->role == 'user' ? 'Me' : $message->role }}</span>
-                            <p class="mt-1 whitespace-pre-wrap">{{ $message->content }}</p>
+                            <p class="mt-1 whitespace-pre-wrap">{{ $content }}</p>
                         </div>
                     </div>
 
