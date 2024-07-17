@@ -92,27 +92,34 @@
         </div>
 
         <!-- File Browser Modal -->
-        <div x-show="showFileBrowser" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" x-cloak>
+        <div x-show="showFileBrowser" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" style="z-index: 9999;" x-cloak>
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-gray-700">
                 <div class="mt-3 text-center">
                     <h3 class="text-lg leading-6 font-medium text-white">File Browser</h3>
                     <div class="mt-2 px-7 py-3">
                         <p class="text-sm text-gray-300">Current Path: {{ $currentPath }}</p>
-                        <ul class="mt-4 space-y-2 text-left">
-                            @foreach($directoryContents as $item)
-                                <li>
-                                    @if($item['type'] === 'dir')
-                                        <button wire:click="browseFiles('{{ $item['path'] }}')" class="text-blue-400 hover:underline">
-                                            📁 {{ $item['name'] }}
-                                        </button>
-                                    @else
-                                        <button wire:click="addFile('{{ $item['path'] }}')" class="text-green-400 hover:underline">
-                                            📄 {{ $item['name'] }} ({{ Number::fileSize($item['size']) }})
-                                        </button>
-                                    @endif
-                                </li>
-                            @endforeach
-                        </ul>
+                        @if($currentPath !== $project->full_path)
+                            <button wire:click="browseFiles('{{ dirname($currentPath) }}')" class="text-blue-400 hover:underline mt-2">
+                                📁 ..
+                            </button>
+                        @endif
+                        <div class="mt-4 space-y-2 text-left max-h-96 overflow-y-auto">
+                            <ul>
+                                @foreach($directoryContents as $item)
+                                    <li>
+                                        @if($item['type'] === 'dir')
+                                            <button wire:click="browseFiles('{{ $item['path'] }}')" class="text-blue-400 hover:underline">
+                                                📁 {{ $item['name'] }}
+                                            </button>
+                                        @else
+                                            <button wire:click="addFile('{{ $item['path'] }}')" class="text-green-400 hover:underline">
+                                                📄 {{ $item['name'] }} ({{ Number::fileSize($item['size']) }})
+                                            </button>
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                     <div class="items-center px-4 py-3">
                         <button @click="toggleFileBrowser()" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">

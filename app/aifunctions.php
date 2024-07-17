@@ -56,7 +56,7 @@ function getAvailableFunctions(): array
         ],
         [
             'name' => 'getContentsFromFile',
-            'description' => 'Get the contents of a file not in the sticky files',
+            'description' => 'Get the contents of a file (not present in the sticky files)',
             'input_schema' => [
                 'type' => 'object',
                 'properties' => [
@@ -69,8 +69,8 @@ function getAvailableFunctions(): array
             ]
         ],
         [
-            'name' => 'saveContentsToFile',
-            'description' => 'Write contents to a file in the project directory',
+            'name' => 'saveDataToFile',
+            'description' => 'Write full data to a file (not present in the sticky files) with the given mode',
             'input_schema' => [
                 'type' => 'object',
                 'properties' => [
@@ -78,17 +78,17 @@ function getAvailableFunctions(): array
                         'type' => 'string',
                         'description' => 'The full path to the file'
                     ],
-                    'contents' => [
+                    'data' => [
                         'type' => 'string',
-                        'description' => 'The contents to write to the file'
+                        'description' => 'The data to write to the file'
                     ],
                     'mode' => [
                         'type' => 'string',
-                        'description' => 'w: replace with new contents. a: append to the existing contents',
+                        'description' => 'w: fully replace with new contents. a: append to the existing contents',
                         'enum' => ['w', 'a']
                     ]
                 ],
-                'required' => ['fullFilePath', 'contents', 'mode']
+                'required' => ['fullFilePath', 'data', 'mode']
             ]
         ],
         [
@@ -262,10 +262,10 @@ function getFilesInFolder($project, $fullFolderPath)
     return $result;
 }
 
-function saveContentsToFile($project, $fullFilePath, $contents = '', $mode = 'w')
+function saveDataToFile($project, $fullFilePath, $data = '', $mode = 'w')
 {
-    if ($contents == '') {
-        return "Error: Content is empty.";
+    if ($data == '') {
+        return "Error: 'contents' parameter is empty";
     }
     switch($mode) {
         case 'w':
@@ -292,7 +292,7 @@ function saveContentsToFile($project, $fullFilePath, $contents = '', $mode = 'w'
     }
 
     $file = fopen($fullFilePath, $mode);
-    fwrite($file, $contents);
+    fwrite($file, $data);
     fclose($file);
 
     return "Content saved.";

@@ -153,12 +153,11 @@ class AIService
             }
             goto begin;
         }
-        dd($messages);
 
         $tools = new Tools();
         $tools->addToolsFromArray(getAvailableFunctions());
 
-        $response = $this->ai->messages(Client::MODEL_3_5_SONNET, $messages, $this->buildSystemMessage(), $tools, [], 2000);
+        $response = $this->ai->messages(Client::MODEL_3_5_SONNET, $messages, $this->buildSystemMessage(), $tools, [], 8000);
 
         if ($response['type'] == 'error') {
             throw new \Exception($response['error']['message']);
@@ -239,7 +238,7 @@ class AIService
     public function getMetaContent()
     {
         $meta = '';
-        if (count($this->project->files))
+        if (count($this->project->files ?? []))
         {
             $meta .= "<StickyFiles>\n";
             foreach ($this->project->files as $file) {

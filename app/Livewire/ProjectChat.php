@@ -76,6 +76,10 @@ class ProjectChat extends Component
             return;
         }
 
+        if (strpos($message, '\\') === 0) {
+            return;
+        }
+
         SendMessageJob::dispatch($this->project, $message);
 
     }

@@ -60,7 +60,7 @@ class ProjectSidebar extends Component
     public function refreshFiles()
     {
         $this->files = [];
-        foreach($this->project->files as $file)
+        foreach($this->project->files ?? [] as $file)
         {
             $this->files[] = [
                 'name' => basename($file),
@@ -183,11 +183,23 @@ class ProjectSidebar extends Component
         if ($path === null) {
             $path = $this->currentPath;
         } else {
-            $this->currentPath = $path;
+            $path = $this->sanitizePath($path);
         }
 
-
+        $this->currentPath = $path;
         $this->directoryContents = $this->getDirectoryContents($path);
+    }
+
+    private function sanitizePath($path)
+    {
+        $realPath = realpath($path);
+        $projectPath = realpath($this->project->full_path);
+
+        if ($realPath === false || strpos($realPath, $projectPath) !== 0) {
+            return $this->project->full_path;
+        }
+
+        return $realPath;
     }
 
     private function getDirectoryContents($path)
@@ -195,22 +207,26 @@ class ProjectSidebar extends Component
         $contents = [];
         $items = scandir($path);
         foreach ($items as $item) {
-            if ($item != "." && $item != "..") {
-                $fullPath = $path . DIRECTORY_SEPARATOR . $item;
-                $contents[] = [
-                    'name' => $item,
-                    'path' => $fullPath,
-                    'type' => is_dir($fullPath) ? 'dir' : 'file',
-                    'size' => is_dir($fullPath) ? '' : filesize($fullPath)
-                ];
+            // Skip current directory, parent directory, and hidden files
+            if ($item == "." || $item == ".." || substr($item, 0, 1) === '.') {
+                continue;
             }
+
+            $fullPath = $path . DIRECTORY_SEPARATOR . $item;
+            $contents[] = [
+                'name' => $item,
+                'path' => $fullPath,
+                'type' => is_dir($fullPath) ? 'dir' : 'file',
+                'size' => is_dir($fullPath) ? '' : filesize($fullPath)
+            ];
         }
         return $contents;
     }
 
+
     public function addFile($filePath)
     {
-        $files = $this->project->files;
+        $files = $this->project->files ?? [];
         if (!in_array($filePath, $files)) {
             $files[] = $filePath;
             $this->project->files = $files;
@@ -221,7 +237,7 @@ class ProjectSidebar extends Component
 
     public function removeFile($index)
     {
-        $files = $this->project->files;
+        $files = $this->project->files ?? [];
         unset($files[$index]);
         $files = array_values($files);
         $this->project->files = $files;
