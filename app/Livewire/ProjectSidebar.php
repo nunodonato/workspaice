@@ -66,22 +66,16 @@ class ProjectSidebar extends Component
         $escapedPath = escapeshellarg($filePath);
 
         if (PHP_OS_FAMILY === 'Linux') {
-            $command = "xdg-open $escapedPath";
+            $command = "xdg-open $escapedPath &";
         } elseif (PHP_OS_FAMILY === 'Darwin') {
-            $command = "open $escapedPath";
+            $command = "open $escapedPath &";
         } elseif (PHP_OS_FAMILY === 'Windows') {
-            $command = "start '' $escapedPath";
+            $command = "start /B'' $escapedPath";
         } else {
             throw new \RuntimeException("Unsupported operating system");
         }
 
-        $output = [];
-        $returnVar = 0;
-        exec($command, $output, $returnVar);
-
-        if ($returnVar !== 0) {
-            throw new \RuntimeException("Failed to open file: " . implode("\n", $output));
-        }
+        pclose(popen($command, 'r'));
     }
 
     public function refreshFiles()
