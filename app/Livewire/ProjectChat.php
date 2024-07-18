@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Jobs\SendMessageJob;
 use App\Models\Project;
 use App\Models\Message;
+use App\Models\Setting;
 use App\Services\AIService;
 use Livewire\Component;
 
@@ -28,6 +29,7 @@ class ProjectChat extends Component
         $this->project = $project;
         $this->loadMessages();
         $this->firstMessageId = $project->messages->first()?->id;
+        $this->debug = Setting::getSetting('default_debug', false);
 
     }
 

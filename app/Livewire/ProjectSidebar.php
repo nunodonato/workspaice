@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Project;
+use App\Models\Setting;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -17,8 +18,8 @@ class ProjectSidebar extends Component
     public $inputTokens = 0;
     public $outputTokens = 0;
 
-    public $inputPricePerM = 3;
-    public $outputPricePerM = 15;
+    public $inputPricePerM = 0;
+    public $outputPricePerM = 0;
 
     public $inputCost = 0;
     public $outputCost = 0;
@@ -34,6 +35,9 @@ class ProjectSidebar extends Component
         $this->prepareTasks();
         $this->snapshots = $project->snapshots()->orderBy('created_at', 'desc')->get();
         $this->refreshFiles();
+
+        $this->inputPricePerM = Setting::getSetting('input_cost');
+        $this->outputPricePerM = Setting::getSetting('output_cost');
     }
 
     public function prepareTasks()
@@ -122,7 +126,8 @@ class ProjectSidebar extends Component
                     $command = "xfce4-terminal --working-directory=$escapedPath";
                 } else {
                     // Fallback to x-terminal-emulator if available
-                    $command = "x-terminal-emulator -e 'cd $escapedPath && exec $SHELL'";
+                    $shell = getenv('SHELL');
+                    $command = "x-terminal-emulator -e 'cd $escapedPath && exec $shell'";
                 }
                 break;
 

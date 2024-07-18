@@ -5,14 +5,13 @@ namespace App\Services;
 use App\Models\Call;
 use App\Models\Message;
 use App\Models\Project;
+use App\Models\Setting;
 use NunoDonato\AnthropicAPIPHP\Client;
 use NunoDonato\AnthropicAPIPHP\Messages;
 use NunoDonato\AnthropicAPIPHP\Tools;
-use Orhanerday\OpenAi\OpenAi;
 
 class AIService
 {
-    public $openai;
     public $ai;
 
     const MAX_TOKENS = 4096;
@@ -23,7 +22,8 @@ class AIService
     public function __construct(public Project $project)
     {
         //$open_ai_key = getenv('OPENAI_API_KEY');
-        $this->ai = new Client(getenv('ANTHROPIC_API_KEY'));
+        $key = Setting::getSetting('api_key', getenv('ANTHROPIC_API_KEY'));
+        $this->ai = new Client($key);
         //$this->openai = new OpenAi($open_ai_key);
     }
 
@@ -157,7 +157,7 @@ class AIService
         $tools = new Tools();
         $tools->addToolsFromArray(getAvailableFunctions());
 
-        $response = $this->ai->messages(Client::MODEL_3_5_SONNET, $messages, $this->buildSystemMessage(), $tools, [], 8000);
+        $response = $this->ai->messages(Client::MODEL_3_5_SONNET, $messages, $this->buildSystemMessage(), $tools, [], 4096);
 
         if ($response['type'] == 'error') {
             throw new \Exception($response['error']['message']);
