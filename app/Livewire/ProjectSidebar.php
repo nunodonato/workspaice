@@ -126,7 +126,7 @@ class ProjectSidebar extends Component
                     $command = "xfce4-terminal --working-directory=$escapedPath";
                 } else {
                     // Fallback to x-terminal-emulator if available
-                    $shell = getenv('SHELL');
+                    $shell = getenv('SHELL') ?? getenv('TERM');
                     $command = "x-terminal-emulator -e 'cd $escapedPath && exec $shell'";
                 }
                 break;
