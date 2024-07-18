@@ -61,6 +61,7 @@ class AIService
 
         $previousMessages = $this->project->messages()
             ->orderByDesc('id')
+            ->where('role', '!=', 'error')
             ->limit($limit)
             ->get()
             ->map(function ($message) {

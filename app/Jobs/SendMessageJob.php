@@ -2,8 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Models\Message;
 use App\Models\Project;
 use App\Services\AIService;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -35,7 +37,16 @@ class SendMessageJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $ai = new AIService($this->project);
-        $ai->sendMessage($this->message);
+        try {
+            $ai = new AIService($this->project);
+            $ai->sendMessage($this->message);
+        } catch (Exception $e) {
+            Message::create([
+                'content' => $e->getMessage(),
+                'role' => 'error',
+                'project_id' => $this->project->id,
+            ]);
+        }
+
     }
 }

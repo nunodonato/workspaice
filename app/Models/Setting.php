@@ -18,6 +18,6 @@ class Setting extends Model
 
     public static function setSetting(string $key, mixed $value): void
     {
-        self::first()->update(['key' => $value]);
+        self::first()->update([$key => $value]);
     }
 }

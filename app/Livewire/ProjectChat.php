@@ -41,7 +41,7 @@ class ProjectChat extends Component
             ->take(100)->get();
 
         $mostRecent = $newMessages->first();
-        if($mostRecent && $mostRecent->role != 'assistant') {
+        if($mostRecent && !in_array($mostRecent->role, ['assistant', 'error'])) {
             $this->loading = true;
         } else {
             $this->loading = false;

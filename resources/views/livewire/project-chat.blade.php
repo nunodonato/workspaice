@@ -32,17 +32,23 @@ $prevRole = '';
                             }
                             $messageClass = 'bg-gray-200';
                             $prevRole = 'think';
+                            $textAlignClass = 'text-left';
                         } else if ($isAssistant) {
                             $mergeMessage = false;
                             $messageClass = 'bg-sky-200';
                             $prevRole = 'assistant';
-                            } else {
+                            $textAlignClass = 'text-left';
+                        } else if ($message->role == 'error') {
+                            $mergeMessage = false;
+                            $messageClass = 'bg-red-300 mx-auto text-center';
+                            $prevRole = 'error';
+                            $textAlignClass = 'text-center';
+                        } else {
                             $mergeMessage = false;
                             $messageClass = 'bg-emerald-200';
                             $prevRole = 'user';
-                            }
-
-                        $textAlignClass = $isAssistant ? 'text-left' : 'text-right';
+                            $textAlignClass = 'text-right';
+                        }
 
                         switch($message->role) {
                             case 'tool_use':

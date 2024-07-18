@@ -10,9 +10,14 @@
             <img src="images/logo-text.png" class="mx-auto"/>
             <div class="mb-6 mt-12 flex justify-between items-center">
                 <h3 class="text-lg font-semibold text-gray-700">Your Projects</h3>
-                <a href="{{ route('projects.create') }}" class="bg-emerald-600 hover:bg-emerald-800 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105">
-                    Create New Project
-                </a>
+                <div class="space-x-4">
+                    <a href="{{ route('settings.index') }}" class="bg-gray-500 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105">
+                        Settings
+                    </a>
+                    <a href="{{ route('projects.create') }}" class="bg-emerald-600 hover:bg-emerald-800 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105">
+                        Create New Project
+                    </a>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
