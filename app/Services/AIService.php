@@ -54,7 +54,7 @@ class AIService
 
     public function sendMessage($input = null, $role = 'user', $name = null): void
     {
-        $limit = 40;
+        $limit = 20;
         if ($input) {
             $this->appendMessage($input, $role, $name);
         }
@@ -90,7 +90,12 @@ class AIService
         $messages = new Messages();
         foreach ($previousMessages as $i => $message) {
             if (count($messages->messages()) == 0 && $message['role'] != 'user') {
-                continue;
+                if (count($previousMessages) > 45 && $message['role'] != 'tool_result') {
+                    $messages->addMessage('user', '');
+                } else {
+                    continue;
+                }
+
             }
             if ($message['role'] == 'tool_use' || $message['role'] == 'tool_result') {
                 $count = count($previousMessages);
@@ -151,10 +156,7 @@ class AIService
 
         if (count($messages->messages()) == 0
         || (count($messages->messages()) == 1 && $this->project->messages()->count() > 1)) {
-            $limit+=20;
-            if ($limit > 500) {
-                throw new \Exception('Too many messages without user role. Aborting.');
-            }
+            $limit+=10;
             goto begin;
         }
 
@@ -225,8 +227,6 @@ class AIService
 
     public function buildSystemMessage(): string
     {
-
-
         $prompt = file_get_contents(storage_path('app/prompts/system.txt'));
 
         $msg = $prompt;
@@ -252,24 +252,6 @@ class AIService
             }
             $meta .= "</StickyFiles>\n";
         }
-        /*$fileBuffer = "<FileBuffer>\n";
-        foreach ($this->project->files ?? [] as $file) {
-            try {
-                $contents = file_get_contents($file);
-            } catch (\Throwable $t) {
-                // remove the file
-                $this->project->files = array_diff($this->project->files, [$file]);
-                $this->project->save();
-
-                continue;
-            }
-            $fileBuffer .= "<File path='$file'>\n";
-            $fileBuffer .= ($contents ?? '(error: file not found)');
-            $fileBuffer .= "\n</File>\n";
-        }
-        $fileBuffer .= "</FileBuffer>\n";
-
-        $meta = $fileBuffer;*/
 
         $meta .= "<SystemInformation>\n{$this->project->system_description}\nDate:". now()->format('Y-m-d H:i:s')."\n</SystemInformation>\n";
         $meta .= "<Tasks>\n{$this->project->tasks}\n</Tasks>\n";
