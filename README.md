@@ -4,6 +4,7 @@
 
 Workspaice is a locally-run application that revolutionizes the way you work on projects. By seamlessly blending human creativity with AI assistance, Workspaice empowers you to create, innovate, and bring your ideas to fruition like never before.
 
+Official website: https://workspaicehq.com
 
 ## 🌟 Key Features
 
