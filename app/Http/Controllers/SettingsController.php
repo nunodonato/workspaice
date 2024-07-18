@@ -23,12 +23,16 @@ class SettingsController extends Controller
         $validatedData = $request->validate([
             'input_cost' => 'required|numeric',
             'output_cost' => 'required|numeric',
-            'api_key' => 'sometimes|string',
+            'api_key' => 'sometimes',
             'default_debug' => 'nullable|sometimes',
         ]);
 
         if (!isset($validatedData['default_debug'])) {
             $validatedData['default_debug'] = false;
+        }
+
+        if (!isset($validatedData['api_key'])) {
+            $validatedData['api_key'] = '';
         }
 
         foreach ($validatedData as $key => $value) {

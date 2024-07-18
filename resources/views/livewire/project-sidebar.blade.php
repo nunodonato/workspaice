@@ -80,17 +80,24 @@
             <ul class="space-y-2">
                 @foreach($files as $index => $file)
                     <li class="flex items-center justify-between bg-gray-700 p-2 rounded">
-                        <span title="{{ $file['full_path'] }}" class="truncate">{{ $file['name'] }} ({{ Number::fileSize($file['size']) }})</span>
-                        <button wire:click="removeFile({{ $index }})" class="text-red-400 hover:text-red-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
+                        <span title="{{ $file['full_path'] }}" class="truncate flex-grow">{{ $file['name'] }} ({{ Number::fileSize($file['size']) }})</span>
+                        <div class="flex items-center">
+                            <button wire:click="openFile('{{ $file['full_path'] }}')" class="text-gray-400 hover:text-white mr-2" title="Open file">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                                    <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                                </svg>
+                            </button>
+                            <button wire:click="removeFile({{ $index }})" class="text-red-400 hover:text-red-600" title="Remove file">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
                     </li>
                 @endforeach
             </ul>
         </div>
-
         <!-- File Browser Modal -->
         <div x-show="showFileBrowser" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" style="z-index: 9999;" x-cloak>
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-gray-700">

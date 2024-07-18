@@ -22,7 +22,10 @@ class AIService
     public function __construct(public Project $project)
     {
         //$open_ai_key = getenv('OPENAI_API_KEY');
-        $key = Setting::getSetting('api_key', getenv('ANTHROPIC_API_KEY'));
+        $key = Setting::getSetting('api_key');
+        if (empty($key)) {
+            $key = getenv('ANTHROPIC_API_KEY');
+        }
         $this->ai = new Client($key);
         //$this->openai = new OpenAi($open_ai_key);
     }
