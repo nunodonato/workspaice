@@ -22,6 +22,11 @@
                 <textarea id="system" wire:model="system" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" rows="3" placeholder="OS version, available tools, ..."></textarea>
                 @error('system') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>
+            <div class="mb-4">
+                <label for="autostart" class="block text-sm font-medium text-gray-700">Autostart the AI</label>
+                <input type="checkbox" wire:model="autostart" name="autostart" id="autostart" checked value="1" class="mt-1 rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                @error('autostart') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            </div>
             <div class="flex items-center justify-between">
                 <button type="submit" class="bg-emerald-600 hover:bg-emerald-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                     Create Project

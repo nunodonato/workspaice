@@ -14,12 +14,14 @@ class ProjectCreation extends Component
     public $description = '';
     public $specs = '';
     public $system = '';
+    public $autostart = '';
 
     protected $rules = [
         'name' => 'required|min:3|max:255',
         'description' => 'required|min:20',
         'specs' => 'required|min:10',
         'system' => 'required|min:10',
+        'autostart' => 'boolean'
     ];
 
     public function mount()
@@ -34,7 +36,9 @@ class ProjectCreation extends Component
 
     public function createProject()
     {
+
         $validatedData = $this->validate();
+        $autoStart = $validatedData['autostart'];
 
         $slug = Str::slug($this->name);
         $homeDir = getenv('HOME');
@@ -44,12 +48,16 @@ class ProjectCreation extends Component
             mkdir($suggestedPath, 0777, true);
         }
 
-        $tasks = "[>] Scan the project directory for existing files and folders
+        if ($autoStart) {
+            $tasks = "[>] Scan the project directory for existing files and folders
 [ ] Ask clarifying questions and rewrite the requirements as needed
 [ ] Consider the challenges for the project and make notes on how to overcome them
 [ ] Assess the availability of resources and tools needed for the project in the system
 [ ] Build a plan of action and get user approval
 [ ] Replace this task list with the new plan";
+        } else {
+            $tasks = "[ ] Discuss the project with the user";
+        }
 
         $project = new Project();
         $project->name = $this->name;
@@ -62,7 +70,9 @@ class ProjectCreation extends Component
         $project->tasks = $tasks;
         $project->save();
 
-        SendMessageJob::dispatch($project, 'Hello', []);
+        if ($autoStart) {
+            SendMessageJob::dispatch($project, 'Hello', []);
+        }
 
         session()->flash('message', 'Project created successfully.');
 
