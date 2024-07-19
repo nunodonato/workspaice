@@ -62,6 +62,9 @@ $prevRole = '';
 
                                  }
                                 break;
+                            case 'assistant':
+                                $content = $message->content;
+
                             default:
                                 $content = $message->content;
                                 break;
@@ -85,7 +88,6 @@ $prevRole = '';
         <form wire:submit.prevent="sendMessage" id="chat-form">
             <div class="flex">
                 <textarea
-                    @if($loading) disabled @endif
                     wire:model="newMessage"
                     class="flex-1 rounded-l-lg p-2 border-t mr-0 border-b border-l text-gray-800 border-gray-200 bg-white resize-none"
                     placeholder="Type your message... (Enter to add line, Shift+Enter to send)"

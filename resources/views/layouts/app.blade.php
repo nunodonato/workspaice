@@ -37,7 +37,7 @@
             @endif
 
             <!-- Page Content -->
-            <main class="pb-12">
+            <main class="">
                 {{ $slot }}
             </main>
         </div>

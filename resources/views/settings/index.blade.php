@@ -20,12 +20,12 @@
                         @csrf
 
                         <div class="mb-4">
-                            <label for="input_cost" class="block text-sm font-medium text-gray-700">Input Cost</label>
+                            <label for="input_cost" class="block text-sm font-medium text-gray-700">Input Cost (per Million tokens)</label>
                             <input type="number" step="0.01" name="input_cost" id="input_cost" value="{{ $settings['input_cost'] }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         </div>
 
                         <div class="mb-4">
-                            <label for="output_cost" class="block text-sm font-medium text-gray-700">Output Cost</label>
+                            <label for="output_cost" class="block text-sm font-medium text-gray-700">Output Cost (per Million tokens)</label>
                             <input type="number" step="0.01" name="output_cost" id="output_cost" value="{{ $settings['output_cost'] }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         </div>
 

@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Support\Facades\Log;
 
 class SendMessageJob implements ShouldQueue
 {
@@ -24,12 +25,15 @@ class SendMessageJob implements ShouldQueue
      */
     public $timeout = 90 * 5;
 
+
+
     /**
      * Create a new job instance.
      */
     public function __construct(private readonly Project $project, private readonly string $message)
     {
-
+        $ai = new AIService($this->project);
+        $ai->appendMessage($this->message, 'user');
     }
 
     /**
@@ -39,13 +43,14 @@ class SendMessageJob implements ShouldQueue
     {
         try {
             $ai = new AIService($this->project);
-            $ai->sendMessage($this->message);
+            $ai->sendMessage(null);
         } catch (Exception $e) {
             Message::create([
                 'content' => $e->getMessage(),
                 'role' => 'error',
                 'project_id' => $this->project->id,
             ]);
+            Log::error($e->getMessage(). ' ('. $e->getFile().':'. $e->getLine().')');
         }
 
     }

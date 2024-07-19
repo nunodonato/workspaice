@@ -6,6 +6,7 @@ use App\Models\Call;
 use App\Models\Message;
 use App\Models\Project;
 use App\Models\Setting;
+use Illuminate\Support\Facades\Cache;
 use NunoDonato\AnthropicAPIPHP\Client;
 use NunoDonato\AnthropicAPIPHP\Messages;
 use NunoDonato\AnthropicAPIPHP\Tools;
@@ -91,7 +92,7 @@ class AIService
         foreach ($previousMessages as $i => $message) {
             if (count($messages->messages()) == 0 && $message['role'] != 'user') {
                 if (count($previousMessages) > 45 && $message['role'] != 'tool_result') {
-                    $messages->addMessage('user', '');
+                    $messages->addMessage('user', 'continue');
                 } else {
                     continue;
                 }
@@ -182,6 +183,12 @@ class AIService
         ]);
 
         $content = $response['content'];
+
+        // check if we should abort
+        if(Cache::has('stop-'.$this->project->id)) {
+            Cache::forget('stop-'.$this->project->id);
+            return;
+        }
 
 
         foreach($content as $i => $message) {

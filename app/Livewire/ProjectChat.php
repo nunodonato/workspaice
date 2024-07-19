@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\Message;
 use App\Models\Setting;
 use App\Services\AIService;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 
 class ProjectChat extends Component
@@ -18,6 +19,8 @@ class ProjectChat extends Component
     public $debug = false;
     public $firstMessageId = 0;
     public $loading = false;
+
+    private $job = null;
 
 
     protected $rules = [
@@ -60,16 +63,18 @@ class ProjectChat extends Component
 
     public function sendMessage()
     {
+        Cache::forget('stop-'.$this->project->id);
         $this->validate();
         $message = trim($this->newMessage);
-        $this->newMessage = '';
 
         if ($message === '\\debug') {
+            $this->newMessage = '';
             $this->debug = !$this->debug;
             return;
         }
 
         if ($message === '\\delete') {
+            $this->newMessage = '';
             $message = Message::where('project_id', $this->project->id)
                 ->orderBy('id', 'desc')
                 ->first();
@@ -78,10 +83,37 @@ class ProjectChat extends Component
             return;
         }
 
-        if (strpos($message, '\\') === 0) {
+
+        if ($message === '\\stop') {
+            Cache::put('stop-'.$this->project->id, true, 60);
+            $this->newMessage = '';
+            $this->loading = false;
+
+            // delete most recent messages if role != assistant and != user
+            delete:
+            $message = Message::where('project_id', $this->project->id)
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if($message && !in_array($message->role, ['assistant', 'user'])) {
+                $message->delete();
+                goto delete;
+            }
+            $this->loadMessages();
+
             return;
         }
 
+        if (strpos($message, '\\') === 0) {
+            $this->newMessage = '';
+            return;
+        }
+
+        if ($this->loading) {
+            return;
+        }
+
+        $this->newMessage = '';
         SendMessageJob::dispatch($this->project, $message);
 
     }
