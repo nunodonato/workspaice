@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Jobs\SendMessageJob;
 use App\Models\Project;
+use App\Models\Setting;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
@@ -20,6 +21,11 @@ class ProjectCreation extends Component
         'specs' => 'required|min:10',
         'system' => 'required|min:10',
     ];
+
+    public function mount()
+    {
+        $this->system = Setting::getSetting('system_info');
+    }
 
     public function updated($propertyName)
     {

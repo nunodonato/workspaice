@@ -14,6 +14,7 @@ class SettingsController extends Controller
             'output_cost' => Setting::getSetting('output_cost'),
             'api_key' => Setting::getSetting('api_key'),
             'default_debug' => Setting::getSetting('default_debug'),
+            'system_info' => Setting::getSetting('system_info'),
         ];
         return view('settings.index', compact('settings'));
     }
@@ -25,6 +26,7 @@ class SettingsController extends Controller
             'output_cost' => 'required|numeric',
             'api_key' => 'sometimes',
             'default_debug' => 'nullable|sometimes',
+            'system_info' => 'string',
         ]);
 
         if (!isset($validatedData['default_debug'])) {

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->float('output_cost', 15);
             $table->string('api_key', '');
             $table->boolean('default_debug', false);
+            $table->string('system_info', 2048);
         });
 
         DB::table('settings')->insert([
@@ -24,6 +25,7 @@ return new class extends Migration
             'output_cost' => 15,
             'api_key' => '',
             'default_debug' => false,
+            'system_info' => PHP_OS,
         ]);
     }
 

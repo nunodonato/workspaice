@@ -35,6 +35,11 @@
                         </div>
 
                         <div class="mb-4">
+                            <label for="system_info" class="block text-sm font-medium text-gray-700">Default System Info</label>
+                            <input type="text" name="system_info" id="system_info" value="{{ $settings['system_info'] }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                        </div>
+
+                        <div class="mb-4">
                             <label for="default_debug" class="block text-sm font-medium text-gray-700">Debug by default</label>
                             <input type="checkbox" name="default_debug" id="default_debug" {{ $settings['default_debug'] ? 'checked' : '' }} class="mt-1 rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                         </div>
