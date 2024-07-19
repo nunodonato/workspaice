@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Image;
 use App\Models\Message;
 use App\Models\Project;
 use App\Services\AIService;
@@ -30,10 +31,18 @@ class SendMessageJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(private readonly Project $project, private readonly string $message)
+    public function __construct(private readonly Project $project, private readonly string $message, private array $images = [])
     {
         $ai = new AIService($this->project);
-        $ai->appendMessage($this->message, 'user');
+        $message = $ai->appendMessage($this->message, 'user');
+        foreach ($images as $image) {
+            $data = [
+                'message_id' => $message->id,
+                'media_type' => $image['media_type'],
+                'content' => $image['content'],
+            ];
+            Image::create($data);
+        }
     }
 
     /**

@@ -1,5 +1,5 @@
 @php
-$prevRole = '';
+    $prevRole = '';
 @endphp
 <div class="flex flex-col h-full" wire:poll.2s="loadMessages">
     <div class="flex-grow overflow-hidden ">
@@ -76,27 +76,52 @@ $prevRole = '';
                         <div class="inline-block max-w-[75%] p-2 rounded-lg text-left {{ $messageClass }} shadow shadow-lg">
                             <span class="font-bold text-xs uppercase">{{ $message->role == 'user' ? 'Me' : $message->role }}</span>
                             <p class="mt-1 whitespace-pre-wrap">{{ $content }}</p>
+                            @if($message->images)
+                                <div class="mt-2 flex flex-wrap gap-2">
+                                    @foreach($message->images as $image)
+                                        <img src="data:{{$image->media_type}};base64, {{$image->content}}" alt="Attached Image" class="max-h-[300px] rounded">
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
                     </div>
-
-            @endforeach
+                @endforeach
 
         </div>
     </div>
-
     <div class="mt-2">
         <form wire:submit.prevent="sendMessage" id="chat-form">
-            <div class="flex">
-                <textarea
-                    wire:model="newMessage"
-                    class="flex-1 rounded-l-lg p-2 border-t mr-0 border-b border-l text-gray-800 border-gray-200 bg-white resize-none"
-                    placeholder="Type your message... (Enter to add line, Shift+Enter to send)"
-                    id="message-input"
-                    rows="2"
-                    x-data
-                    wire:keydown.shift.enter="sendMessage"
-                ></textarea>
-                <button @if($loading) disabled @endif type="submit" class="px-4 rounded-r-lg @if($loading) bg-emerald-200 border-green-200 @else bg-emerald-600 hover:bg-emerald-800 border-green-600 @endif  text-white font-bold p-2 uppercase  border-t border-b border-r">Send</button>
+            <div class="flex flex-col space-y-2">
+                @if(count($images) > 0)
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($images as $index => $image)
+                            <div class="relative">
+                                <img src="{{ $image->temporaryUrl() }}" alt="Selected Image" class="w-20 h-20 object-cover rounded">
+                                <button type="button" wire:click="removeImage({{ $index }})" class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                                    &times;
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+                <div class="flex">
+                    <label for="image-upload" class="cursor-pointer px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-l-lg flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </label>
+                    <input id="image-upload" type="file" class="hidden" wire:model="images" multiple accept="image/jpeg,image/png,image/gif,image/webp">
+                    <textarea
+                        wire:model="newMessage"
+                        class="flex-1 p-2 border-t border-b border-l text-gray-800 border-gray-200 bg-white resize-none"
+                        placeholder="Type your message... (Enter to add line, Shift+Enter to send)"
+                        id="message-input"
+                        rows="2"
+                        x-data
+                        wire:keydown.shift.enter="sendMessage"
+                    ></textarea>
+                    <button @if($loading) disabled @endif type="submit" class="px-4 rounded-r-lg @if($loading) bg-emerald-200 border-green-200 @else bg-emerald-600 hover:bg-emerald-800 border-green-600 @endif  text-white font-bold p-2 uppercase  border-t border-b border-r">Send</button>
+                </div>
             </div>
         </form>
     </div>

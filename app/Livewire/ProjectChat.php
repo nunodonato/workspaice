@@ -9,9 +9,12 @@ use App\Models\Setting;
 use App\Services\AIService;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 class ProjectChat extends Component
 {
+    use WithFileUploads;
+
     public $project;
     public $newMessage = '';
     public $messages = [];
@@ -20,11 +23,12 @@ class ProjectChat extends Component
     public $firstMessageId = 0;
     public $loading = false;
 
-    private $job = null;
+    public $images = [];
 
 
     protected $rules = [
-        'newMessage' => 'required|min:1',
+        'newMessage' => 'required_without:images|min:1',
+        'images.*' => 'image|max:1536|mimes:jpg,png,gif,webp',
     ];
 
     public function mount(Project $project)
@@ -61,6 +65,20 @@ class ProjectChat extends Component
 
     }
 
+    public function updatedImages()
+    {
+        $this->validate([
+            'images.*' => 'image|max:1536|mimes:jpg,png,gif,webp',
+        ]);
+
+    }
+
+    public function removeImage($index)
+    {
+        unset($this->images[$index]);
+        $this->images = array_values($this->images);
+    }
+
     public function sendMessage()
     {
         Cache::forget('stop-'.$this->project->id);
@@ -79,6 +97,14 @@ class ProjectChat extends Component
                 ->orderBy('id', 'desc')
                 ->first();
             $message?->delete();
+
+            $message = Message::where('project_id', $this->project->id)
+                ->orderBy('id', 'desc')
+                ->first();
+            if ($message->role === 'user') {
+                $message->delete();
+            }
+
             $this->loadMessages();
             return;
         }
@@ -114,8 +140,18 @@ class ProjectChat extends Component
         }
 
         $this->newMessage = '';
-        SendMessageJob::dispatch($this->project, $message);
-
+        $imageData = [];
+        foreach($this->images as $image) {
+            $mimeType = $image->getMimeType();
+            $base64 = base64_encode($image->get());
+            $imageData[] = [
+                'media_type' => $mimeType,
+                'content' => $base64,
+            ];
+            $image->delete();
+        }
+        SendMessageJob::dispatch($this->project, $message, $imageData);
+        $this->images = [];
     }
 
     public function render()

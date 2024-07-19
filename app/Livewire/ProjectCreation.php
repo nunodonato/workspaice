@@ -56,7 +56,7 @@ class ProjectCreation extends Component
         $project->tasks = $tasks;
         $project->save();
 
-        SendMessageJob::dispatch($project, 'Hello');
+        SendMessageJob::dispatch($project, 'Hello', []);
 
         session()->flash('message', 'Project created successfully.');
 

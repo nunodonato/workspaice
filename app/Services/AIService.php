@@ -31,7 +31,7 @@ class AIService
         //$this->openai = new OpenAi($open_ai_key);
     }
 
-    public function appendMessage(string $message, string $role, $name = null, $tool_id = null, $input = null, $multiple = false)
+    public function appendMessage(string $message, string $role, $name = null, $tool_id = null, $input = null, $multiple = false): Message
     {
         $message = [
             'content' => $message,
@@ -50,7 +50,7 @@ class AIService
 
         $message['project_id'] = $this->project->id;
         $message['multiple'] = $multiple;
-        Message::create($message);
+        return Message::create($message);
     }
 
     public function sendMessage($input = null, $role = 'user', $name = null): void
@@ -65,6 +65,7 @@ class AIService
 
         $previousMessages = $this->project->messages()
             ->orderByDesc('id')
+            ->with('images')
             ->where('role', '!=', 'error')
             ->limit($limit)
             ->get()
@@ -72,6 +73,7 @@ class AIService
                 $array = [
                     'content' => $message->content,
                     'role' => $message->role,
+                    'images' => $message->images,
                 ];
                 if ($message->name) {
                     $array['name'] = $message->name;
@@ -153,6 +155,12 @@ class AIService
             }
 
             $messages->addMessage($message['role'], $message['content']);
+
+            if ($message['role'] == 'user') {
+                foreach($message['images'] as $image) {
+                    $messages->addUserImageMessageFromBase64($image['content'], $image['media_type']);
+                }
+            }
         }
 
         if (count($messages->messages()) == 0
