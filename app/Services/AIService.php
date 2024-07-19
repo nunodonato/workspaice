@@ -27,7 +27,7 @@ class AIService
         if (empty($key)) {
             $key = getenv('ANTHROPIC_API_KEY');
         }
-        $this->ai = new Client($key);
+        $this->ai = (new Client($key))->setTimeout(60);
         //$this->openai = new OpenAi($open_ai_key);
     }
 

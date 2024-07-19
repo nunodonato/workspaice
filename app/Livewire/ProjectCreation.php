@@ -71,7 +71,7 @@ class ProjectCreation extends Component
         $project->save();
 
         if ($autoStart) {
-            SendMessageJob::dispatch($project, 'Hello', []);
+            SendMessageJob::dispatch($project, "(hello)", []);
         }
 
         session()->flash('message', 'Project created successfully.');

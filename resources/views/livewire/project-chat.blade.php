@@ -12,7 +12,7 @@
             @foreach ($messages as $message)
                 @php
                 // check if the message is the first message of the $project->messages()
-                    if ($message->id == $firstMessageId) {
+                    if ($message->id == $firstMessageId && $message->content == '(hello)') {
                         continue;
                     }
 
