@@ -251,6 +251,20 @@ class AIService
         $msg .= "Description: {$this->project->description}\n";
         $msg .= "Technical Specs: {$this->project->technical_specs}\n";
         $msg .= "</ProjectInformation>\n";
+
+        $filemap = $this->project->full_path . DIRECTORY_SEPARATOR . '.workspaice/filemap';
+        $map = 'file';
+        if (!file_exists($filemap)) {
+            $filemap = $this->project->full_path . DIRECTORY_SEPARATOR . '.workspaice/dirmap';
+            $map = 'dir';
+        }
+        if (file_exists($filemap)) {
+            $tag = $map == 'file' ? 'FileList' : 'DirectoryList';
+            $msg .= "<$tag>\n";
+            $msg .= file_get_contents($filemap);
+            $msg .= "</$tag>\n";
+        }
+
         return $msg;
     }
 

@@ -32,7 +32,6 @@ class ProjectSidebar extends Component
     {
         $this->project = $project;
         $this->currentPath = $project->full_path;
-        $this->prepareTasks();
         $this->snapshots = $project->snapshots()->orderBy('created_at', 'desc')->get();
         $this->refreshFiles();
 
@@ -40,22 +39,8 @@ class ProjectSidebar extends Component
         $this->outputPricePerM = Setting::getSetting('output_cost');
     }
 
-    public function prepareTasks()
-    {
-        // find [X] and replace with ✅
-        // find [>] and replace with ➡️
-        // find [ ] and replace with ⬜
-
-        /** @var string $originalTasks */
-        $originalTasks = $this->project->tasks;
-        $this->tasks = preg_replace('/\[X\]/', '✅', $originalTasks);
-        $this->tasks = preg_replace('/\[>\]/', '➡️', $this->tasks);
-        $this->tasks = preg_replace('/\[ \]/', '⬜', $this->tasks);
-    }
-
     public function render()
     {
-        $this->prepareTasks();
         $this->refreshFiles();
         $this->countTokens();
         return view('livewire.project-sidebar');

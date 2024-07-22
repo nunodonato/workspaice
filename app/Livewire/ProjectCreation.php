@@ -48,15 +48,22 @@ class ProjectCreation extends Component
             mkdir($suggestedPath, 0777, true);
         }
 
+        // create hidden directory to hold meta files (windows and linux)
+        $workspaiceDir = $suggestedPath . '/.workspaice';
+        if (!is_dir($workspaiceDir)) {
+            mkdir($workspaiceDir, 0777, true);
+        }
+
         if ($autoStart) {
-            $tasks = "[>] Scan the project directory for existing files and folders
-[ ] Ask clarifying questions and rewrite the requirements as needed
-[ ] Consider the challenges for the project and make notes on how to overcome them
-[ ] Assess the availability of resources and tools needed for the project in the system
-[ ] Build a plan of action and get user approval
-[ ] Replace this task list with the new plan";
+            $tasks = "✅ Scan the project directory for existing files and folders
+➡️ Ask clarifying questions and rewrite the requirements as needed
+⬜ Consider the challenges for the project and make notes on how to overcome them
+⬜ Assess the availability of resources and tools needed for the project in the system
+⬜ Build a plan of action and get user approval
+⬜ Replace this task list with the new plan";
         } else {
-            $tasks = "[ ] Discuss the project with the user";
+            $tasks = "✅ Scan the project directory for existing files and folders
+➡️ Discuss the project with the user and elaborate a plan with tasks";
         }
 
         $project = new Project();

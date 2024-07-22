@@ -251,6 +251,7 @@ function getContentsFromFile($project, $fullFilePath)
 
 function getTreeFolderStructure($project, $fullFolderPath)
 {
+    // ToDO: windows???
     return runShellCommand($project, "tree -d {$fullFolderPath}");
 }
 
@@ -280,7 +281,7 @@ function getFilesInFolder($project, $fullFolderPath)
     return $result;
 }
 
-function saveDataToFile($project, $fullFilePath, $data = '', $mode = 'w')
+function saveDataToFile(Project $project, $fullFilePath, $data = '', $mode = 'w')
 {
     if ($data == '') {
         return "Error: 'contents' parameter is empty";
@@ -313,10 +314,11 @@ function saveDataToFile($project, $fullFilePath, $data = '', $mode = 'w')
     fwrite($file, $data);
     fclose($file);
 
+    $project->updateFileMap();
     return "Content saved.";
 }
 
-function applyDiffToFile($project, $fullFilePath, $data)
+function applyDiffToFile(Project $project, $fullFilePath, $data)
 {
     if (!file_exists($fullFilePath)) {
         $searchResult = searchForFile($project, basename($fullFilePath));
@@ -386,6 +388,8 @@ function runShellCommand(Project $project, $input, $maxLines = 100)
     if (strlen($final) == 0) {
         $final = "Success.";
     }
+
+    $project->updateFileMap();
     return $final;
 }
 
