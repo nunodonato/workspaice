@@ -81,8 +81,14 @@ class ProjectSidebar extends Component
     public function refreshFiles()
     {
         $this->files = [];
-        foreach($this->project->files ?? [] as $file)
+        foreach($this->project->files ?? [] as $index => $file)
         {
+            // check if file still exists
+            if (!file_exists($file)) {
+                // remove it from the project
+                $this->removeFile($index);
+            }
+
             $this->files[] = [
                 'name' => basename($file),
                 'full_path' => $file,

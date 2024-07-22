@@ -92,6 +92,24 @@ function getAvailableFunctions(): array
             ]
         ],
         [
+            'name' => 'applyDiffToFile',
+            'description' => 'Change a file content by applying a diff',
+            'input_schema' => [
+                'type' => 'object',
+                'properties' => [
+                    'fullFilePath' => [
+                        'type' => 'string',
+                        'description' => 'The full path to the file'
+                    ],
+                    'data' => [
+                        'type' => 'string',
+                        'description' => 'The data with the diff content'
+                    ],
+                ],
+                'required' => ['fullFilePath', 'data']
+            ]
+        ],
+        [
             'name' => 'getTreeFolderStructure',
             'description' => 'Get a tree structure of the folders(no files) in the given path',
             'input_schema' => [
@@ -296,6 +314,56 @@ function saveDataToFile($project, $fullFilePath, $data = '', $mode = 'w')
     fclose($file);
 
     return "Content saved.";
+}
+
+function applyDiffToFile($project, $fullFilePath, $data)
+{
+    if (!file_exists($fullFilePath)) {
+        $searchResult = searchForFile($project, basename($fullFilePath));
+        return "Error: file does not exist\n\n".$searchResult;
+    }
+
+    // The original file content
+    $original = file_get_contents($fullFilePath);
+
+    if (!function_exists('xdiff_string_patch')) {
+        $patched = apply_unified_diff($original, $data);
+    } else {
+        // Apply the patch
+        $patched = xdiff_string_patch($original, $data);
+    }
+
+    if ($patched === false) {
+        return "Error: Failed to apply the patch";
+    } else {
+        // Save the patched content back to the file
+        file_put_contents($fullFilePath, $patched);
+    }
+
+    return "Return: diff applied.";
+}
+
+// fallback for when ext-xdiff is not available
+function apply_unified_diff($sourceContent, $diffContent) {
+    $source_lines = explode("\n", $sourceContent);
+    $diff_lines = explode("\n", $diffContent);
+    $result = [];
+    $source_line = 0;
+
+    foreach ($diff_lines as $line) {
+        if (preg_match('/^@@\s+-(\d+),\d+\s+\+(\d+),\d+\s+@@/', $line, $matches)) {
+            $source_line = $matches[1] - 1;
+        } elseif (strpos($line, '+') === 0) {
+            $result[] = substr($line, 1);
+        } elseif (strpos($line, '-') === 0) {
+            $source_line++;
+        } elseif (strpos($line, ' ') === 0) {
+            $result[] = $source_lines[$source_line];
+            $source_line++;
+        }
+    }
+
+    return implode("\n", $result);
 }
 
 function runShellCommand(Project $project, $input, $maxLines = 100)
