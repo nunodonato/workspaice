@@ -202,6 +202,8 @@ function updateProjectInfo($project, $whatToUpdate, $newContent)
         case 'tasks':
             return updateProjectTasks($project, $newContent);
     }
+
+    return "Invalid whatToUpdate";
 }
 
 function updateProjectTasks($project, $newTasks)
@@ -393,7 +395,7 @@ function runShellCommand(Project $project, $input, $maxLines = 100)
     return $final;
 }
 
-function execWithTimeout($cmd, $timeout = 20, $path) {
+function execWithTimeout($cmd, $timeout, $path) {
     $env = array('PATH' => getenv('PATH'));
     $descriptorspec = array(
         0 => array("pipe", "r"),  // stdin
