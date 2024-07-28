@@ -15,20 +15,13 @@ class AIService
 {
     public $ai;
 
-    const MAX_TOKENS = 4096;
-    const TEMPERATURE = 1;
-
-    const MODEL = 'gpt-4o';
-
     public function __construct(public Project $project)
     {
-        //$open_ai_key = getenv('OPENAI_API_KEY');
         $key = Setting::getSetting('api_key');
         if (empty($key)) {
             $key = getenv('ANTHROPIC_API_KEY');
         }
         $this->ai = (new Client($key))->setTimeout(60);
-        //$this->openai = new OpenAi($open_ai_key);
     }
 
     public function appendMessage(string $message, string $role, $name = null, $tool_id = null, $input = null, $multiple = false): Message
@@ -63,32 +56,7 @@ class AIService
         begin:
         $shouldRepeat = false;
 
-        $previousMessages = $this->project->messages()
-            ->orderByDesc('id')
-            ->with('images')
-            ->where('role', '!=', 'error')
-            ->limit($limit)
-            ->get()
-            ->map(function ($message) {
-                $array = [
-                    'content' => $message->content,
-                    'role' => $message->role,
-                    'images' => $message->images,
-                ];
-                if ($message->name) {
-                    $array['name'] = $message->name;
-                }
-                if ($message->tool_id) {
-                    $array['tool_id'] = $message->tool_id;
-                }
-                if ($message->input) {
-                    $array['input'] = $message->input;
-                }
-            return $array;
-        })->reverse()->toArray();
-
-        // reorder array keys, keeping values in place
-        $previousMessages = array_values($previousMessages);
+        $previousMessages = $this->getPreviousMessages($limit);
 
         $messages = new Messages();
         foreach ($previousMessages as $i => $message) {
@@ -286,5 +254,40 @@ class AIService
         $meta .= "<Tasks>\n{$this->project->tasks}\n</Tasks>\n";
         $meta .= "<Notes>\n{$this->project->notes}</Notes>";
         return $meta;
+    }
+
+    /**
+     * @param int $limit
+     * @return array
+     */
+    public function getPreviousMessages(int $limit): array
+    {
+        $previousMessages = $this->project->messages()
+            ->orderByDesc('id')
+            ->with('images')
+            ->where('role', '!=', 'error')
+            ->limit($limit)
+            ->get()
+            ->map(function ($message) {
+                $array = [
+                    'content' => $message->content,
+                    'role' => $message->role,
+                    'images' => $message->images,
+                ];
+                if ($message->name) {
+                    $array['name'] = $message->name;
+                }
+                if ($message->tool_id) {
+                    $array['tool_id'] = $message->tool_id;
+                }
+                if ($message->input) {
+                    $array['input'] = $message->input;
+                }
+                return $array;
+            })->reverse()->toArray();
+
+        // reorder array keys, keeping values in place
+        $previousMessages = array_values($previousMessages);
+        return $previousMessages;
     }
 }
