@@ -15,11 +15,11 @@ function getAvailableFunctions(): array
                 'properties' => [
                     'string' => [
                         'type' => 'string',
-                        'description' => 'The string to search for in the filename'
+                        'description' => 'The string to search for in the filename',
                     ],
                 ],
-                'required' => ['string']
-            ]
+                'required' => ['string'],
+            ],
         ],
         [
             'name' => 'updateProjectInfo',
@@ -30,14 +30,14 @@ function getAvailableFunctions(): array
                     'whatToUpdate' => [
                         'type' => 'string',
                         'enum' => ['description', 'technical_specs', 'system_description', 'notes', 'tasks'],
-                        'description' => 'The section to update'
+                        'description' => 'The section to update',
                     ],
                     'newContent' => [
                         'type' => 'string',
-                        'description' => 'The new content'
-                    ]
+                        'description' => 'The new content',
+                    ],
                 ],
-                'required' => ['whatToUpdate', 'newContent']
+                'required' => ['whatToUpdate', 'newContent'],
             ],
         ],
         [
@@ -48,11 +48,11 @@ function getAvailableFunctions(): array
                 'properties' => [
                     'input' => [
                         'type' => 'string',
-                        'description' => 'The shell command to run'
+                        'description' => 'The shell command to run',
                     ],
                 ],
-                'required' => ['input']
-            ]
+                'required' => ['input'],
+            ],
         ],
         [
             'name' => 'getContentsFromFile',
@@ -62,11 +62,11 @@ function getAvailableFunctions(): array
                 'properties' => [
                     'fullFilePath' => [
                         'type' => 'string',
-                        'description' => 'The full path to the file'
+                        'description' => 'The full path to the file',
                     ],
                 ],
-                'required' => ['fullFilePath']
-            ]
+                'required' => ['fullFilePath'],
+            ],
         ],
         [
             'name' => 'saveDataToFile',
@@ -76,38 +76,20 @@ function getAvailableFunctions(): array
                 'properties' => [
                     'fullFilePath' => [
                         'type' => 'string',
-                        'description' => 'The full path to the file'
+                        'description' => 'The full path to the file',
                     ],
                     'data' => [
                         'type' => 'string',
-                        'description' => 'The data to write to the file'
+                        'description' => 'The data to write to the file',
                     ],
                     'mode' => [
                         'type' => 'string',
                         'description' => 'w: fully replace with new contents. a: append to the existing contents',
-                        'enum' => ['w', 'a']
-                    ]
-                ],
-                'required' => ['fullFilePath', 'data', 'mode']
-            ]
-        ],
-        [
-            'name' => 'applyDiffToFile',
-            'description' => 'Change a file content by applying a diff',
-            'input_schema' => [
-                'type' => 'object',
-                'properties' => [
-                    'fullFilePath' => [
-                        'type' => 'string',
-                        'description' => 'The full path to the file'
-                    ],
-                    'data' => [
-                        'type' => 'string',
-                        'description' => 'The data with the diff content'
+                        'enum' => ['w', 'a'],
                     ],
                 ],
-                'required' => ['fullFilePath', 'data']
-            ]
+                'required' => ['fullFilePath', 'data', 'mode'],
+            ],
         ],
         [
             'name' => 'getTreeFolderStructure',
@@ -117,11 +99,11 @@ function getAvailableFunctions(): array
                 'properties' => [
                     'fullFolderPath' => [
                         'type' => 'string',
-                        'description' => 'The full path of the folder, to get the tree structure from'
+                        'description' => 'The full path of the folder, to get the tree structure from',
                     ],
                 ],
-                'required' => ['fullFolderPath']
-            ]
+                'required' => ['fullFolderPath'],
+            ],
         ],
         [
             'name' => 'getFilesInFolder',
@@ -131,11 +113,11 @@ function getAvailableFunctions(): array
                 'properties' => [
                     'fullFolderPath' => [
                         'type' => 'string',
-                        'description' => 'The full path of the folder, to get the contents from'
+                        'description' => 'The full path of the folder, to get the contents from',
                     ],
                 ],
-                'required' => ['fullFolderPath']
-            ]
+                'required' => ['fullFolderPath'],
+            ],
         ],
         [
             'name' => 'getContentFromUrl',
@@ -145,12 +127,12 @@ function getAvailableFunctions(): array
                 'properties' => [
                     'url' => [
                         'type' => 'string',
-                        'description' => 'The full url path'
+                        'description' => 'The full url path',
                     ],
                 ],
-                'required' => ['url']
-            ]
-        ]
+                'required' => ['url'],
+            ],
+        ],
 
     ];
 }
@@ -168,7 +150,7 @@ function searchForFile($project, string $string): string
 
     $result = "Matching files with '$string':\n";
     foreach ($matchingFiles as $file) {
-        $result .= $file . PHP_EOL;
+        $result .= $file.PHP_EOL;
     }
 
     return $result;
@@ -183,7 +165,6 @@ function getContentFromUrl($project, $url)
     $content = explode('<body>', $content);
     $content = explode('</body>', $content[1]);
     $content = $content[0];
-
 
     return $content;
 }
@@ -203,48 +184,54 @@ function updateProjectInfo($project, $whatToUpdate, $newContent)
             return updateProjectTasks($project, $newContent);
     }
 
-    return "Invalid whatToUpdate";
+    return 'Invalid whatToUpdate';
 }
 
 function updateProjectTasks($project, $newTasks)
 {
     $project->tasks = $newTasks;
     $project->save();
-    return "Tasks updated.";
+
+    return 'Tasks updated.';
 }
 
 function updateProjectDescription($project, $newDescription)
 {
     $project->description = $newDescription;
     $project->save();
-    return "Description updated.";
+
+    return 'Description updated.';
 }
 
 function updateProjectTechnicalSpecs($project, $newTechnicalSpecs)
 {
     $project->technical_specs = $newTechnicalSpecs;
     $project->save();
-    return "Specs updated.";
+
+    return 'Specs updated.';
 }
 
 function updateProjectSystemDescription($project, $newSystemDescription)
 {
     $project->system_description = $newSystemDescription;
     $project->save();
-    return "Description updated.";
+
+    return 'Description updated.';
 }
 
 function updateProjectNotes($project, $newNotes)
 {
     $project->notes = $newNotes;
     $project->save();
-    return "Notes updated.";
+
+    return 'Notes updated.';
 }
 
 function getContentsFromFile($project, $fullFilePath)
 {
-    if (!file_exists($fullFilePath)) {
+    if (! file_exists($fullFilePath)) {
         $searchResult = searchForFile($project, basename($fullFilePath));
+
         return "Error: file does not exist\n\n".$searchResult;
     }
 
@@ -259,27 +246,28 @@ function getTreeFolderStructure($project, $fullFolderPath)
 
 function getFilesInFolder($project, $fullFolderPath)
 {
-    if (!file_exists($fullFolderPath)) {
-        return "Error: folder does not exist";
+    if (! file_exists($fullFolderPath)) {
+        return 'Error: folder does not exist';
     }
     $files = scandir($fullFolderPath);
-    $result = "";
+    $result = '';
 
     foreach ($files as $item) {
         // '.' and '..' are the current and parent directories respectively
-        if ($item != "." && $item != "..") {
-            $fullPath = $fullFolderPath . DIRECTORY_SEPARATOR . $item;
+        if ($item != '.' && $item != '..') {
+            $fullPath = $fullFolderPath.DIRECTORY_SEPARATOR.$item;
             if (is_file($fullPath)) {
                 $filesize = filesize($fullPath);
                 if ($filesize) {
                     $filesize = Number::fileSize($filesize);
                 }
-                $result .= $item . " (File ".($filesize?? '' ).")" . PHP_EOL;
+                $result .= $item.' (File '.($filesize ?? '').')'.PHP_EOL;
             } elseif (is_dir($fullPath)) {
-                $result .= $item . " (Folder)" . PHP_EOL;
+                $result .= $item.' (Folder)'.PHP_EOL;
             }
         }
     }
+
     return $result;
 }
 
@@ -288,7 +276,7 @@ function saveDataToFile(Project $project, $fullFilePath, $data = '', $mode = 'w'
     if ($data == '') {
         return "Error: 'contents' parameter is empty";
     }
-    switch($mode) {
+    switch ($mode) {
         case 'w':
             $mode = 'w';
             break;
@@ -304,11 +292,11 @@ function saveDataToFile(Project $project, $fullFilePath, $data = '', $mode = 'w'
 
     // make sure the dir is inside the project full_path
     if (stripos($dir, $project->full_path) !== 0) {
-        return "Error: Invalid file path. Must be inside the project directory.";
+        return 'Error: Invalid file path. Must be inside the project directory.';
     }
 
     // Create the directory and all its parent directories if they don't exist
-    if (!is_dir($dir)) {
+    if (! is_dir($dir)) {
         mkdir($dir, 0755, true);
     }
 
@@ -317,67 +305,18 @@ function saveDataToFile(Project $project, $fullFilePath, $data = '', $mode = 'w'
     fclose($file);
 
     $project->updateFileMap();
-    return "Content saved.";
-}
 
-function applyDiffToFile(Project $project, $fullFilePath, $data)
-{
-    if (!file_exists($fullFilePath)) {
-        $searchResult = searchForFile($project, basename($fullFilePath));
-        return "Error: file does not exist\n\n".$searchResult;
-    }
-
-    // The original file content
-    $original = file_get_contents($fullFilePath);
-
-    if (!function_exists('xdiff_string_patch')) {
-        $patched = apply_unified_diff($original, $data);
-    } else {
-        // Apply the patch
-        $patched = xdiff_string_patch($original, $data);
-    }
-
-    if ($patched === false) {
-        return "Error: Failed to apply the patch";
-    } else {
-        // Save the patched content back to the file
-        file_put_contents($fullFilePath, $patched);
-    }
-
-    return "Return: diff applied.";
-}
-
-// fallback for when ext-xdiff is not available
-function apply_unified_diff($sourceContent, $diffContent) {
-    $source_lines = explode("\n", $sourceContent);
-    $diff_lines = explode("\n", $diffContent);
-    $result = [];
-    $source_line = 0;
-
-    foreach ($diff_lines as $line) {
-        if (preg_match('/^@@\s+-(\d+),\d+\s+\+(\d+),\d+\s+@@/', $line, $matches)) {
-            $source_line = $matches[1] - 1;
-        } elseif (strpos($line, '+') === 0) {
-            $result[] = substr($line, 1);
-        } elseif (strpos($line, '-') === 0) {
-            $source_line++;
-        } elseif (strpos($line, ' ') === 0) {
-            $result[] = $source_lines[$source_line];
-            $source_line++;
-        }
-    }
-
-    return implode("\n", $result);
+    return 'Content saved.';
 }
 
 function runShellCommand(Project $project, $input, $maxLines = 100)
 {
-    $input .= " 2>&1";
-    $final = "";
+    $input .= ' 2>&1';
+    $final = '';
 
     $result = execWithTimeout($input, 20, $project->full_path);
     if ($result['timed_out']) {
-        return "Error: Command timed out. Was it an interactive command?";
+        return 'Error: Command timed out. Was it an interactive command?';
     }
     if ($result['code'] > 0) {
         $final = "Errors running command:\n";
@@ -388,20 +327,22 @@ function runShellCommand(Project $project, $input, $maxLines = 100)
     $final .= $output;
     $final = trim($final);
     if (strlen($final) == 0) {
-        $final = "Success.";
+        $final = 'Success.';
     }
 
     $project->updateFileMap();
+
     return $final;
 }
 
-function execWithTimeout($cmd, $timeout, $path) {
-    $env = array('PATH' => getenv('PATH'));
-    $descriptorspec = array(
-        0 => array("pipe", "r"),  // stdin
-        1 => array("pipe", "w"),  // stdout
-        2 => array("pipe", "w")   // stderr
-    );
+function execWithTimeout($cmd, $timeout, $path)
+{
+    $env = ['PATH' => getenv('PATH')];
+    $descriptorspec = [
+        0 => ['pipe', 'r'],  // stdin
+        1 => ['pipe', 'w'],  // stdout
+        2 => ['pipe', 'w'],   // stderr
+    ];
 
     $process = proc_open($cmd, $descriptorspec, $pipes, $path, $env);
 
@@ -423,7 +364,8 @@ function execWithTimeout($cmd, $timeout, $path) {
             // Check if we've exceeded the timeout
             if (time() - $start_time > $timeout) {
                 proc_terminate($process);
-                return array('output' => $output, 'timed_out' => true, 'code' => $status['exitcode']);
+
+                return ['output' => $output, 'timed_out' => true, 'code' => $status['exitcode']];
             }
 
             usleep(100000); // Sleep for 0.1 seconds to reduce CPU usage
@@ -437,7 +379,7 @@ function execWithTimeout($cmd, $timeout, $path) {
         // Close the process
         proc_close($process);
 
-        return array('output' => $output, 'timed_out' => false, 'code' => $status['exitcode']);
+        return ['output' => $output, 'timed_out' => false, 'code' => $status['exitcode']];
     }
 
     return false;

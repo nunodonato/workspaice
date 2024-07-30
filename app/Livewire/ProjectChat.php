@@ -3,10 +3,9 @@
 namespace App\Livewire;
 
 use App\Jobs\SendMessageJob;
-use App\Models\Project;
 use App\Models\Message;
+use App\Models\Project;
 use App\Models\Setting;
-use App\Services\AIService;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -16,15 +15,20 @@ class ProjectChat extends Component
     use WithFileUploads;
 
     public $project;
+
     public $newMessage = '';
+
     public $messages = [];
+
     public $lastMessageId = 0;
+
     public $debug = false;
+
     public $firstMessageId = 0;
+
     public $loading = false;
 
     public $images = [];
-
 
     protected $rules = [
         'newMessage' => 'required_without:images|min:1',
@@ -40,7 +44,6 @@ class ProjectChat extends Component
 
     }
 
-    #[On('snapshot-restored')]
     public function loadMessages()
     {
         $newMessages = Message::where('project_id', $this->project->id)
@@ -48,7 +51,7 @@ class ProjectChat extends Component
             ->take(100)->get();
 
         $mostRecent = $newMessages->first();
-        if($mostRecent && !in_array($mostRecent->role, ['assistant', 'error'])) {
+        if ($mostRecent && ! in_array($mostRecent->role, ['assistant', 'error'])) {
             $this->loading = true;
         } else {
             $this->loading = false;
@@ -59,7 +62,7 @@ class ProjectChat extends Component
             $this->messages[] = $message;
         }
 
-        if (!$this->firstMessageId) {
+        if (! $this->firstMessageId) {
             $this->firstMessageId = $this->project->messages->first()?->id;
         }
 
@@ -87,7 +90,8 @@ class ProjectChat extends Component
 
         if ($message === '\\debug') {
             $this->newMessage = '';
-            $this->debug = !$this->debug;
+            $this->debug = ! $this->debug;
+
             return;
         }
 
@@ -106,9 +110,9 @@ class ProjectChat extends Component
             }
 
             $this->loadMessages();
+
             return;
         }
-
 
         if ($message === '\\stop') {
             Cache::put('stop-'.$this->project->id, true, 60);
@@ -121,7 +125,7 @@ class ProjectChat extends Component
                 ->orderBy('id', 'desc')
                 ->first();
 
-            if($message && !in_array($message->role, ['assistant', 'user'])) {
+            if ($message && ! in_array($message->role, ['assistant', 'user'])) {
                 $message->delete();
                 goto delete;
             }
@@ -132,6 +136,7 @@ class ProjectChat extends Component
 
         if (strpos($message, '\\') === 0) {
             $this->newMessage = '';
+
             return;
         }
 
@@ -141,7 +146,7 @@ class ProjectChat extends Component
 
         $this->newMessage = '';
         $imageData = [];
-        foreach($this->images as $image) {
+        foreach ($this->images as $image) {
             $mimeType = $image->getMimeType();
             $base64 = base64_encode($image->get());
             $imageData[] = [
@@ -157,6 +162,7 @@ class ProjectChat extends Component
     public function render()
     {
         $this->loadMessages();
+
         return view('livewire.project-chat');
     }
 }

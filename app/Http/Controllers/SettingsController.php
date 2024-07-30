@@ -16,6 +16,7 @@ class SettingsController extends Controller
             'default_debug' => Setting::getSetting('default_debug'),
             'system_info' => Setting::getSetting('system_info'),
         ];
+
         return view('settings.index', compact('settings'));
     }
 
@@ -29,11 +30,11 @@ class SettingsController extends Controller
             'system_info' => 'string',
         ]);
 
-        if (!isset($validatedData['default_debug'])) {
+        if (! isset($validatedData['default_debug'])) {
             $validatedData['default_debug'] = false;
         }
 
-        if (!isset($validatedData['api_key'])) {
+        if (! isset($validatedData['api_key'])) {
             $validatedData['api_key'] = '';
         }
 

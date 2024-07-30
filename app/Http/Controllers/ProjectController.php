@@ -10,6 +10,7 @@ class ProjectController extends Controller
     public function index()
     {
         $projects = Project::all();
+
         return view('projects.index', compact('projects'));
     }
 
@@ -61,12 +62,12 @@ class ProjectController extends Controller
     public function restoreSnapshot(Project $project, $snapshotId)
     {
         $snapshot = $project->snapshots()->find($snapshotId);
-        if (!$snapshot) {
+        if (! $snapshot) {
             abort(404);
         }
 
         $path = $project->full_path;
-        shell_exec("cd $path && git reset --hard " . $snapshot->commit);
+        shell_exec("cd $path && git reset --hard ".$snapshot->commit);
         shell_exec("cd $path && git clean -fd");
         // delete all snapshots after this one
         $project->snapshots()->where('id', '>', $snapshotId)->delete();

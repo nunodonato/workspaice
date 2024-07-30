@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 
 class Project extends Model
 {
@@ -54,28 +53,29 @@ class Project extends Model
             if ($file->isDir() && $onlyFolders) {
                 $relativePath = substr($file->getPathname(), $pathLength);
                 if (strpos($relativePath, '.') !== 0) {
-                    $result .= $relativePath . PHP_EOL;
+                    $result .= $relativePath.PHP_EOL;
                 }
             }
 
-            if ($file->isFile() && !$onlyFolders) {
+            if ($file->isFile() && ! $onlyFolders) {
                 $relativePath = substr($file->getPathname(), $pathLength);
                 // Skip files in hidden folders
                 if (strpos($relativePath, '.') !== 0) {
-                    $result .= $relativePath . PHP_EOL;
+                    $result .= $relativePath.PHP_EOL;
                 }
             }
         }
 
         if ($onlyFolders) {
-            $filemapFile = $this->full_path . DIRECTORY_SEPARATOR.'.workspaice/filemap';
+            $filemapFile = $this->full_path.DIRECTORY_SEPARATOR.'.workspaice/filemap';
             unlink($filemapFile);
-            $filemapFile = $this->full_path . DIRECTORY_SEPARATOR.'.workspaice/dirmap';
+            $filemapFile = $this->full_path.DIRECTORY_SEPARATOR.'.workspaice/dirmap';
         } else {
-            $filemapFile = $this->full_path . DIRECTORY_SEPARATOR.'.workspaice/filemap';
+            $filemapFile = $this->full_path.DIRECTORY_SEPARATOR.'.workspaice/filemap';
         }
 
         file_put_contents($filemapFile, $result);
+
         return $result;
     }
 }

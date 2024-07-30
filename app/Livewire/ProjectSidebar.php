@@ -9,23 +9,30 @@ use Livewire\WithFileUploads;
 
 class ProjectSidebar extends Component
 {
-
     use WithFileUploads;
 
     public $project;
+
     public $tasks;
+
     public $snapshots;
+
     public $inputTokens = 0;
+
     public $outputTokens = 0;
 
     public $inputPricePerM = 0;
+
     public $outputPricePerM = 0;
 
     public $inputCost = 0;
+
     public $outputCost = 0;
 
     public $files = [];
+
     public $currentPath = '/';
+
     public $directoryContents = [];
 
     public function mount(Project $project)
@@ -43,6 +50,7 @@ class ProjectSidebar extends Component
     {
         $this->refreshFiles();
         $this->countTokens();
+
         return view('livewire.project-sidebar');
     }
 
@@ -57,7 +65,7 @@ class ProjectSidebar extends Component
         } elseif (PHP_OS_FAMILY === 'Windows') {
             $command = "start /B'' $escapedPath";
         } else {
-            throw new \RuntimeException("Unsupported operating system");
+            throw new \RuntimeException('Unsupported operating system');
         }
 
         pclose(popen($command, 'r'));
@@ -66,10 +74,9 @@ class ProjectSidebar extends Component
     public function refreshFiles()
     {
         $this->files = [];
-        foreach($this->project->files ?? [] as $index => $file)
-        {
+        foreach ($this->project->files ?? [] as $index => $file) {
             // check if file still exists
-            if (!file_exists($file)) {
+            if (! file_exists($file)) {
                 // remove it from the project
                 $this->removeFile($index);
             }
@@ -78,7 +85,7 @@ class ProjectSidebar extends Component
                 'name' => basename($file),
                 'full_path' => $file,
                 'size' => filesize($file),
-                'mime_type' => mime_content_type($file)
+                'mime_type' => mime_content_type($file),
             ];
         }
     }
@@ -92,6 +99,7 @@ class ProjectSidebar extends Component
         $this->inputCost = $this->inputTokens * $this->inputPricePerM / 1_000_000;
         $this->outputCost = $this->outputTokens * $this->outputPricePerM / 1_000_000;
     }
+
     public function openFolder()
     {
         $escapedPath = escapeshellarg($this->project->full_path);
@@ -102,8 +110,6 @@ class ProjectSidebar extends Component
             $command = "open $escapedPath";
         } elseif (PHP_OS_FAMILY === 'Windows') {
             $command = "explorer $escapedPath";
-        } else {
-
         }
 
         $output = [];
@@ -115,8 +121,8 @@ class ProjectSidebar extends Component
     {
         $path = $this->project->full_path;
 
-        if (!is_dir($path)) {
-            throw new \RuntimeException("Invalid directory path");
+        if (! is_dir($path)) {
+            throw new \RuntimeException('Invalid directory path');
         }
 
         $escapedPath = escapeshellarg($path);
@@ -149,7 +155,7 @@ class ProjectSidebar extends Component
                 break;
 
             default:
-                throw new \RuntimeException("Unsupported operating system");
+                throw new \RuntimeException('Unsupported operating system');
         }
 
         $output = [];
@@ -157,7 +163,7 @@ class ProjectSidebar extends Component
         exec($command, $output, $returnVar);
 
         if ($returnVar !== 0) {
-            throw new \RuntimeException("Failed to open terminal: " . implode("\n", $output));
+            throw new \RuntimeException('Failed to open terminal: '.implode("\n", $output));
         }
     }
 
@@ -171,7 +177,7 @@ class ProjectSidebar extends Component
         $path = $this->project->full_path;
         $commitMessage = now()->format('Y-m-d H:i:s');
         shell_exec("cd $path && git add .");
-        $commitOutput = shell_exec("cd $path && git commit -m '" . $commitMessage . "'");
+        $commitOutput = shell_exec("cd $path && git commit -m '".$commitMessage."'");
 
         if (preg_match('/\[.* ([a-f0-9]+)\]/', $commitOutput, $matches)) {
             $commitId = $matches[1];
@@ -222,26 +228,26 @@ class ProjectSidebar extends Component
         $items = scandir($path);
         foreach ($items as $item) {
             // Skip current directory, parent directory, and hidden files
-            if ($item == "." || $item == ".." || substr($item, 0, 1) === '.') {
+            if ($item == '.' || $item == '..' || substr($item, 0, 1) === '.') {
                 continue;
             }
 
-            $fullPath = $path . DIRECTORY_SEPARATOR . $item;
+            $fullPath = $path.DIRECTORY_SEPARATOR.$item;
             $contents[] = [
                 'name' => $item,
                 'path' => $fullPath,
                 'type' => is_dir($fullPath) ? 'dir' : 'file',
-                'size' => is_dir($fullPath) ? '' : filesize($fullPath)
+                'size' => is_dir($fullPath) ? '' : filesize($fullPath),
             ];
         }
+
         return $contents;
     }
-
 
     public function addFile($filePath)
     {
         $files = $this->project->files ?? [];
-        if (!in_array($filePath, $files)) {
+        if (! in_array($filePath, $files)) {
             $files[] = $filePath;
             $this->project->files = $files;
             $this->project->save();
@@ -258,6 +264,4 @@ class ProjectSidebar extends Component
         $this->project->save();
         $this->refreshFiles();
     }
-
-
 }

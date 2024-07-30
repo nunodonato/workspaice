@@ -10,7 +10,9 @@ class Setting extends Model
     use HasFactory;
 
     public $timestamps = false;
+
     public $guarded = [];
+
     public static function getSetting(string $key, mixed $default = null): mixed
     {
         return self::first()->$key ?? $default;
