@@ -60,7 +60,7 @@ Official website: https://workspaicehq.com
 
    In one terminal, start the server:
    ```
-   npm run serve
+   php artisan serve
    ```
 
    In another terminal, start the queue worker:
