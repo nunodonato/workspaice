@@ -6,13 +6,6 @@ Workspaice is a locally-run application that revolutionizes the way you work on 
 
 Official website: https://workspaicehq.com
 
-## 🌟 Key Features
-
-- **Local-First**: Run Workspaice directly on your computer, ensuring privacy and speed.
-- **AI Collaboration**: Work side-by-side with AI to enhance your productivity and creativity.
-- **Project Management**: Easily create and organize your projects in one place.
-- **Cross-Platform**: Built with Laravel and SQLite for a smooth experience across different operating systems.
-
 ## 🚀 Getting Started
 
 1. **Clone the Repository**
@@ -60,7 +53,7 @@ Official website: https://workspaicehq.com
 
    In one terminal, start the server:
    ```
-   npm run serve
+   php artisan serve
    ```
 
    In another terminal, start the queue worker:
