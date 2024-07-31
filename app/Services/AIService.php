@@ -122,7 +122,7 @@ class AIService
 
     public function getSystemMessage(): string
     {
-        $prompt = file_get_contents(storage_path('app/prompts/system.txt'));
+        $prompt = file_get_contents(resource_path('prompts/system.txt'));
 
         $msg = $prompt;
         $msg .= "<ProjectInformation>\n";
